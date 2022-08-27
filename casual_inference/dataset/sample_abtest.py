@@ -27,8 +27,9 @@ def create_sample_ab_result(
     if len(simulated_lift) == 0:
         simulated_lift = [0.005 * i for i in range(n_variant) if i != 0]
     simulated_lift.insert(0, 0)  # insert lift of control variant for convenience
+
     for i in range(n_variant):
-        ab_result.loc[ab_result["variant"] == i + 1, "metric"] = np.random.binomial(
-            n=1, p=metric_base * (1 + simulated_lift[i]), size=ab_result.loc[ab_result["variant"] == i + 1].shape[0]
-        )
+        p = metric_base * (1 + simulated_lift[i])
+        size = ab_result.loc[ab_result["variant"] == i + 1].shape[0]
+        ab_result.loc[ab_result["variant"] == i + 1, "metric"] = np.random.binomial(n=1, p=p, size=size)
     return ab_result
