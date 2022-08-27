@@ -25,7 +25,7 @@ def create_sample_ab_result(
     ab_result["metric"] = 0
 
     if len(simulated_lift) == 0:
-        simulated_lift = [0.005 * i for i in range(n_variant) if i != 0]
+        simulated_lift = [0.05 * i for i in range(n_variant) if i != 0]
     simulated_lift.insert(0, 0)  # insert lift of control variant for convenience
 
     for i in range(n_variant):

@@ -1,1 +1,1 @@
-# casual-inference
+# casual_inference
