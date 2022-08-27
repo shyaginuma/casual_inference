@@ -1,4 +1,3 @@
-from multiprocessing.sharedctypes import Value
 import pandas as pd
 
 
@@ -37,10 +36,10 @@ class ABTestEvaluator:
 
         for metric in metrics:
             stats[f"abs_diff_{metric}", "mean"] = stats[metric]["mean"] - stats[f"{metric}_c"]["mean"]
-            stats[f"rel_diff_{metric}", "mean"] = stats[metric]["mean"]/stats[f"{metric}_c"]["mean"]
+            stats[f"rel_diff_{metric}", "mean"] = stats[metric]["mean"] / stats[f"{metric}_c"]["mean"]
         self.stats = stats
 
     def summary(self) -> None:
-        if self.stats == None:
+        if self.stats is None:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
         pass
