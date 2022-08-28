@@ -16,7 +16,9 @@ jobs:
           poetry install --no-interaction
       - name: lint
         run: |
+          source $HOME/.poetry/env
           make lint
       - name: test
         run: |
+          source $HOME/.poetry/env
           make test
