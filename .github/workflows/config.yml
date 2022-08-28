@@ -24,6 +24,7 @@ jobs:
         run: make lint
   test:
     needs: test
+    runs-on: ubuntu-latest
     steps:
       - name: test
         run: make test
