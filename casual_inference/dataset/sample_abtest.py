@@ -12,7 +12,8 @@ def create_sample_ab_result(
         Sample A/B test result contains columns as follows
             - rand_unit: randomization unit. something like user_id, session_id, ...
             - variant: which pattern the unit was assigned. assuming 1 is the control group.
-            - metric: a binary metric assuming the target metric of the A/B test. e.g., Click, Purchase, ...
+            - metric_bin: a binary metric assuming the target metric of the A/B test. e.g., Click, Purchase, ...
+            - metric_cont: a continuous metric assuming the target metric of the A/B test. e.g., Clicks, Purchases, ...
     """
     if n_variant <= 1:
         raise ValueError("n_variant should be more than or equal 2.")
@@ -22,7 +23,8 @@ def create_sample_ab_result(
     ab_result = pd.DataFrame()
     ab_result["rand_unit"] = [i for i in range(sample_size)]
     ab_result["variant"] = np.random.choice(a=[i + 1 for i in range(n_variant)], size=sample_size)
-    ab_result["metric"] = 0
+    ab_result["metric_bin"] = 0
+    ab_result["metric_cont"] = 0
 
     if len(simulated_lift) == 0:
         simulated_lift = [0.05 * i for i in range(n_variant) if i != 0]
@@ -31,5 +33,6 @@ def create_sample_ab_result(
     for i in range(n_variant):
         p = metric_base * (1 + simulated_lift[i])
         size = ab_result.loc[ab_result["variant"] == i + 1].shape[0]
-        ab_result.loc[ab_result["variant"] == i + 1, "metric"] = np.random.binomial(n=1, p=p, size=size)
+        ab_result.loc[ab_result["variant"] == i + 1, "metric_bin"] = np.random.binomial(n=1, p=p, size=size)
+        ab_result.loc[ab_result["variant"] == i + 1, "metric_cont"] = np.random.poisson(lam=p * 10, size=size)
     return ab_result
