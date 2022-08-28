@@ -23,7 +23,7 @@ jobs:
       - name: lint
         run: make lint
   test:
-    needs: test
+    needs: dependencies
     runs-on: ubuntu-latest
     steps:
       - name: test
