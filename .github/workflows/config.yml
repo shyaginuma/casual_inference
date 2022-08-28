@@ -1,0 +1,29 @@
+name: ci
+on: [push]
+jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: install poetry
+        run: |
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          poetry --version
+      - name: install dependencies
+        run: |
+          poetry install
+  lint:
+    needs: dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: lint
+        run: make lint
+  test:
+    needs: test
+    steps:
+      - name: test
+        run: make test
