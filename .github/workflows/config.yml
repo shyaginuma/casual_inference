@@ -16,7 +16,7 @@ jobs:
           poetry --version
       - name: install dependencies
         run: |
-          poetry install
+          poetry install --no-interaction
   lint:
     needs: dependencies
     runs-on: ubuntu-latest
