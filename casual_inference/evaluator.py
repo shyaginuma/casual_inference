@@ -1,4 +1,6 @@
+import numpy as np
 import pandas as pd
+from scipy.stats import ttest_ind_from_stats
 
 
 class ABTestEvaluator:
@@ -7,6 +9,7 @@ class ABTestEvaluator:
 
     def evaluate(self, data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[str]) -> None:
         """calculate stats of A/B test and cache it into the class variable.
+        At first, it only assumes metrics can handle by Welch's t-test.
 
         Parameters
         ----------
@@ -30,13 +33,58 @@ class ABTestEvaluator:
         if len(metrics) == 0:
             raise ValueError("metrics hasn't been specified.")
 
-        stats = data.groupby(variant_col)[metrics].agg(["mean", "var"])
-        stats["sample_size"] = data.groupby(variant_col)[unit_col].count()
-        stats = stats.merge(stats.query(f"{variant_col} == 1"), suffixes=["", "_c"], how="cross")
+        means = (
+            data.groupby(variant_col)[metrics]
+            .mean()
+            .stack()
+            .reset_index()
+            .rename(columns={"level_1": "metric", 0: "mean"})
+        )
+        vars = (
+            data.groupby(variant_col)[metrics]
+            .var()
+            .stack()
+            .reset_index()
+            .rename(columns={"level_1": "metric", 0: "var"})
+        )
+        counts = (
+            data.groupby(variant_col)[metrics]
+            .count()
+            .stack()
+            .reset_index()
+            .rename(columns={"level_1": "metric", 0: "count"})
+        )
+        stats = means.merge(vars, on=[variant_col, "metric"]).merge(counts, on=[variant_col, "metric"])
+        stats["std"] = np.sqrt(stats["var"])
+        stats = stats.merge(stats.query(f"{variant_col} == 1"), on="metric", suffixes=["", "_c"]).drop(
+            "variant_c", axis=1
+        )
 
-        for metric in metrics:
-            stats[f"abs_diff_{metric}", "mean"] = stats[metric]["mean"] - stats[f"{metric}_c"]["mean"]
-            stats[f"rel_diff_{metric}", "mean"] = stats[metric]["mean"] / stats[f"{metric}_c"]["mean"]
+        stats["abs_diff_mean"] = stats["mean"] - stats["mean_c"]
+        stats["abs_diff_std"] = np.sqrt(np.power(stats["std"], 2)/stats["count"] + np.power(stats["std_c"], 2)/stats["count_c"])
+        stats["rel_diff_mean"] = stats["mean"] / stats["mean_c"] - 1
+
+        # see: https://arxiv.org/pdf/1803.06336.pdf
+        stats["rel_diff_std"] = np.sqrt(
+            (
+                stats["var"] / stats["count"]
+                + (stats["mean"] ** 2 / stats["mean_c"] ** 2) * stats["var_c"] / stats["count_c"]
+            )
+            / stats["mean_c"]
+        )
+        stats["t_value"] = stats["abs_diff_mean"] / stats["abs_diff_std"]
+        stats["p_value"] = stats.apply(
+            lambda x: ttest_ind_from_stats(
+                mean1=x["mean"],
+                std1=x["std"],
+                nobs1=x["count"],
+                mean2=x["mean_c"],
+                std2=x["std_c"],
+                nobs2=x["count_c"],
+                equal_var=False,
+            ).pvalue,
+            axis=1,
+        )
         self.stats = stats
 
     def summary(self) -> None:
