@@ -61,7 +61,9 @@ class ABTestEvaluator:
         )
 
         stats["abs_diff_mean"] = stats["mean"] - stats["mean_c"]
-        stats["abs_diff_std"] = np.sqrt(np.power(stats["std"], 2)/stats["count"] + np.power(stats["std_c"], 2)/stats["count_c"])
+        stats["abs_diff_std"] = np.sqrt(
+            np.power(stats["std"], 2) / stats["count"] + np.power(stats["std_c"], 2) / stats["count_c"]
+        )
         stats["rel_diff_mean"] = stats["mean"] / stats["mean_c"] - 1
 
         # see: https://arxiv.org/pdf/1803.06336.pdf
