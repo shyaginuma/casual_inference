@@ -1,7 +1,7 @@
 name: ci
 on: [push]
 jobs:
-  dependencies:
+  lint and test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,17 +14,9 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
           source $HOME/.poetry/env
           poetry install --no-interaction
-  lint:
-    needs: dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: lint
-        run: make lint
-  test:
-    needs: dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+        run: |
+          make lint
       - name: test
-        run: make test
+        run: |
+          make test
