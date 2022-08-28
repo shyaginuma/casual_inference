@@ -12,7 +12,7 @@ jobs:
       - name: install poetry
         run: |
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+          source $HOME/.poetry/env
           poetry --version
       - name: install dependencies
         run: |
