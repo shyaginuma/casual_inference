@@ -9,3 +9,7 @@ lint:
 fmt:
 	poetry run black .
 	poetry run isort .
+
+.PHONY: test
+test:
+	poetry run pytest .
