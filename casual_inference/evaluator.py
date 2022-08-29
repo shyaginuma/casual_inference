@@ -56,22 +56,18 @@ class ABTestEvaluator:
         )
         stats = means.merge(vars, on=[variant_col, "metric"]).merge(counts, on=[variant_col, "metric"])
         stats["std"] = np.sqrt(stats["var"])
+        stats["stderr"] = np.sqrt(stats["var"] / stats["count"])
         stats = stats.merge(stats.query(f"{variant_col} == 1"), on="metric", suffixes=["", "_c"]).drop(
             "variant_c", axis=1
         )
 
         stats["abs_diff_mean"] = stats["mean"] - stats["mean_c"]
-        stats["abs_diff_std"] = np.sqrt(
-            np.power(stats["std"], 2) / stats["count"] + np.power(stats["std_c"], 2) / stats["count_c"]
-        )
+        stats["abs_diff_std"] = np.sqrt(stats["stderr"] ** 2 + stats["stderr_c"] ** 2)
         stats["rel_diff_mean"] = stats["mean"] / stats["mean_c"] - 1
 
         # see: https://arxiv.org/pdf/1803.06336.pdf
         stats["rel_diff_std"] = np.sqrt(
-            (
-                stats["var"] / stats["count"]
-                + (stats["mean"] ** 2 / stats["mean_c"] ** 2) * stats["var_c"] / stats["count_c"]
-            )
+            (stats["stderr"] ** 2 + (stats["mean"] ** 2 / stats["mean_c"] ** 2) * stats["stderr_c"] ** 2)
             / stats["mean_c"]
         )
         stats["t_value"] = stats["abs_diff_mean"] / stats["abs_diff_std"]
@@ -89,7 +85,17 @@ class ABTestEvaluator:
         )
         self.stats = stats
 
-    def summary(self) -> None:
+    def summary(self) -> pd.DataFrame:
+        """return statistics summary.
+
+        In the future, styling dataframe or add another visualization can be considered.
+
+        Returns
+        -------
+        pd.DataFrame
+            stats summary
+        """
         if self.stats is None:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
-        pass
+        return_cols = [col for col in self.stats.columns if col[-2:] != "_c"]
+        return self.stats.loc[:, return_cols]
