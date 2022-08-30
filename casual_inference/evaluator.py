@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import plotly
+import plotly.express as px
 from scipy.stats import ttest_ind_from_stats
 
 
@@ -85,7 +87,7 @@ class ABTestEvaluator:
         )
         self.stats = stats
 
-    def summary(self) -> pd.DataFrame:
+    def summary_table(self) -> pd.DataFrame:
         """return statistics summary.
 
         In the future, styling dataframe or add another visualization can be considered.
@@ -99,3 +101,43 @@ class ABTestEvaluator:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
         return_cols = [col for col in self.stats.columns if col[-2:] != "_c"]
         return self.stats.loc[:, return_cols]
+
+    def summary_barplot(
+        self, p_threshold: float = 0.05, diff_type: str = "rel_diff", display_ci: bool = True
+    ) -> plotly.graph_objs.Figure:
+        """plot impact and confidence interval for each metric
+
+        Parameters
+        ----------
+        p_threshold : float, optional
+            significance level, by default 0.05
+
+        Returns
+        -------
+        plotly.graph_objs.Figure
+        """
+        if self.stats is None:
+            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+        if diff_type not in ["rel_diff", "abs_diff"]:
+            raise ValueError("Specified diff type is invalid.")
+
+        stats = self.stats.copy(deep=True)
+        stats["significant"] = stats.apply(
+            lambda x: "up"
+            if x["p_value"] <= p_threshold and x["t_value"] > 0
+            else "down"
+            if x["p_value"] <= p_threshold and x["t_value"] < 0
+            else "unclear",
+            axis=1,
+        )
+
+        g = px.bar(
+            data_frame=stats,
+            x=f"{diff_type}_mean",
+            y="metric",
+            facet_col="variant",
+            color="significant",
+            color_discrete_map={"up": "blue", "down": "red", "unclear": "gray"},  # TODO: adjust later
+        )
+        g.show()
+        return g
