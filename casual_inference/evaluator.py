@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import plotly
 import plotly.express as px
-from scipy.stats import ttest_ind_from_stats
+from scipy.stats import t, ttest_ind_from_stats
 
 
 class ABTestEvaluator:
@@ -68,11 +68,14 @@ class ABTestEvaluator:
         stats["rel_diff_mean"] = stats["mean"] / stats["mean_c"] - 1
 
         # see: https://arxiv.org/pdf/1803.06336.pdf
-        stats["rel_diff_std"] = np.sqrt(
-            (stats["stderr"] ** 2 + (stats["mean"] ** 2 / stats["mean_c"] ** 2) * stats["stderr_c"] ** 2)
+        stats["rel_diff_std"] = (
+            np.sqrt((stats["stderr"] ** 2 + (stats["mean"] ** 2 / stats["mean_c"] ** 2) * stats["stderr_c"] ** 2))
             / stats["mean_c"]
         )
         stats["t_value"] = stats["abs_diff_mean"] / stats["abs_diff_std"]
+        stats["dof"] = stats["abs_diff_std"] ** 4 / (
+            stats["stderr"] ** 4 / (stats["count"] - 1) + stats["stderr_c"] ** 4 / (stats["count_c"] - 1)
+        )
         stats["p_value"] = stats.apply(
             lambda x: ttest_ind_from_stats(
                 mean1=x["mean"],
@@ -131,13 +134,19 @@ class ABTestEvaluator:
             axis=1,
         )
 
-        g = px.bar(
-            data_frame=stats,
-            x=f"{diff_type}_mean",
-            y="metric",
-            facet_col="variant",
-            color="significant",
-            color_discrete_map={"up": "#54A24B", "down": "#E45756", "unclear": "silver"},
-        )
+        viz_options = {
+            "data_frame": stats,
+            "x": f"{diff_type}_mean",
+            "y": "metric",
+            "facet_col": "variant",
+            "color": "significant",
+            "color_discrete_map": {"up": "#54A24B", "down": "#E45756", "unclear": "silver"},
+        }
+        if display_ci:
+            stats["ci_width"] = t.ppf(1 - p_threshold / 2, stats["dof"]) * stats[f"{diff_type}_std"]
+            viz_options["error_x"] = "ci_width"
+            print(stats[["variant", "metric", "ci_width", "p_value", "rel_diff_mean", "rel_diff_std"]])
+
+        g = px.bar(**viz_options)
         g.show()
         return g
