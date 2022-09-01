@@ -137,7 +137,7 @@ class ABTestEvaluator:
             y="metric",
             facet_col="variant",
             color="significant",
-            color_discrete_map={"up": "blue", "down": "red", "unclear": "gray"},  # TODO: adjust later
+            color_discrete_map={"up": "#54A24B", "down": "#E45756", "unclear": "silver"},
         )
         g.show()
         return g
