@@ -145,7 +145,6 @@ class ABTestEvaluator:
         if display_ci:
             stats["ci_width"] = t.ppf(1 - p_threshold / 2, stats["dof"]) * stats[f"{diff_type}_std"]
             viz_options["error_x"] = "ci_width"
-            print(stats[["variant", "metric", "ci_width", "p_value", "rel_diff_mean", "rel_diff_std"]])
 
         g = px.bar(**viz_options)
         g.show()
