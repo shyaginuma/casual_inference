@@ -90,10 +90,15 @@ class ABTestEvaluator:
         )
         self.stats = stats
 
-    def summary_table(self) -> pd.DataFrame:
+    def summary_table(self, p_threshold: float = 0.05) -> pd.DataFrame:
         """return statistics summary.
 
         In the future, styling dataframe or add another visualization can be considered.
+
+        Parameters
+        ----------
+        p_threshold : float, optional
+            significance level, by default 0.05
 
         Returns
         -------
@@ -102,11 +107,20 @@ class ABTestEvaluator:
         """
         if self.stats is None:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
-        return_cols = [col for col in self.stats.columns if col[-2:] != "_c"]
-        return self.stats.loc[:, return_cols]
+
+        stats = self.stats.copy(deep=True)
+        significance, abs_ci_width, rel_ci_width = self._eval_significance(p_threshold)
+        stats["significance"] = significance
+        stats["abs_ci_width"] = abs_ci_width
+        stats["rel_ci_width"] = rel_ci_width
+        for diff_type in ["abs", "rel"]:
+            stats[f"ci_{diff_type}_diff"] = stats.apply(lambda x: (x[f"{diff_type}_diff_mean"] - x[f"{diff_type}_ci_width"], x[f"{diff_type}_diff_mean"] + x[f"{diff_type}_ci_width"]), axis=1)
+            del stats[f"{diff_type}_ci_width"]
+        return_cols = [col for col in stats.columns if col[-2:] != "_c"]
+        return stats.loc[:, return_cols]
 
     def summary_barplot(
-        self, p_threshold: float = 0.05, diff_type: str = "rel_diff", display_ci: bool = True
+        self, p_threshold: float = 0.05, diff_type: str = "rel", display_ci: bool = True
     ) -> plotly.graph_objs.Figure:
         """plot impact and confidence interval for each metric
 
@@ -121,11 +135,48 @@ class ABTestEvaluator:
         """
         if self.stats is None:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
-        if diff_type not in ["rel_diff", "abs_diff"]:
+        if diff_type not in ["rel", "abs"]:
             raise ValueError("Specified diff type is invalid.")
 
         stats = self.stats.copy(deep=True)
-        stats["significant"] = stats.apply(
+        significance, abs_ci_width, rel_ci_width = self._eval_significance(p_threshold)
+        stats["significant"] = significance
+        stats["abs_ci_width"] = abs_ci_width
+        stats["rel_ci_width"] = rel_ci_width
+
+        viz_options = {
+            "data_frame": stats,
+            "x": f"{diff_type}_diff_mean",
+            "y": "metric",
+            "facet_col": "variant",
+            "color": "significant",
+            "color_discrete_map": {"up": "#54A24B", "down": "#E45756", "unclear": "silver"},
+        }
+        if display_ci:
+            viz_options["error_x"] = f"{diff_type}_ci_width"
+
+        g = px.bar(**viz_options)
+        g.show()
+        return g
+
+    def _eval_significance(self, p_threshold: float = 0.05) -> tuple[pd.Series]:
+        """evaluate statistical significance & return information related to that.
+
+        Parameters
+        ----------
+        p_threshold : float, optional
+            _description_, by default 0.05
+
+        Returns
+        -------
+        tuple[pd.Series]
+            includes three pd.Series as follows:
+            - statistical significance
+            - confidence interval width of absolute difference
+            - confidence interval width of relative difference
+        """
+
+        significance = self.stats.apply(
             lambda x: "up"
             if x["p_value"] <= p_threshold and x["t_value"] > 0
             else "down"
@@ -134,18 +185,7 @@ class ABTestEvaluator:
             axis=1,
         )
 
-        viz_options = {
-            "data_frame": stats,
-            "x": f"{diff_type}_mean",
-            "y": "metric",
-            "facet_col": "variant",
-            "color": "significant",
-            "color_discrete_map": {"up": "#54A24B", "down": "#E45756", "unclear": "silver"},
-        }
-        if display_ci:
-            stats["ci_width"] = t.ppf(1 - p_threshold / 2, stats["dof"]) * stats[f"{diff_type}_std"]
-            viz_options["error_x"] = "ci_width"
+        abs_ci_width = t.ppf(1 - p_threshold / 2, self.stats["dof"]) * self.stats[f"abs_diff_std"]
+        rel_ci_width = t.ppf(1 - p_threshold / 2, self.stats["dof"]) * self.stats[f"rel_diff_std"]
 
-        g = px.bar(**viz_options)
-        g.show()
-        return g
+        return significance, abs_ci_width, rel_ci_width
