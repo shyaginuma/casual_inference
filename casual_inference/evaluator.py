@@ -114,7 +114,13 @@ class ABTestEvaluator:
         stats["abs_ci_width"] = abs_ci_width
         stats["rel_ci_width"] = rel_ci_width
         for diff_type in ["abs", "rel"]:
-            stats[f"ci_{diff_type}_diff"] = stats.apply(lambda x: (x[f"{diff_type}_diff_mean"] - x[f"{diff_type}_ci_width"], x[f"{diff_type}_diff_mean"] + x[f"{diff_type}_ci_width"]), axis=1)
+            stats[f"ci_{diff_type}_diff"] = stats.apply(
+                lambda x: (
+                    x[f"{diff_type}_diff_mean"] - x[f"{diff_type}_ci_width"],
+                    x[f"{diff_type}_diff_mean"] + x[f"{diff_type}_ci_width"],
+                ),
+                axis=1,
+            )
             del stats[f"{diff_type}_ci_width"]
         return_cols = [col for col in stats.columns if col[-2:] != "_c"]
         return stats.loc[:, return_cols]
@@ -159,7 +165,7 @@ class ABTestEvaluator:
         g.show()
         return g
 
-    def _eval_significance(self, p_threshold: float = 0.05) -> tuple[pd.Series]:
+    def _eval_significance(self, p_threshold: float = 0.05) -> tuple[pd.Series, pd.Series, pd.Series]:
         """evaluate statistical significance & return information related to that.
 
         Parameters
@@ -185,7 +191,7 @@ class ABTestEvaluator:
             axis=1,
         )
 
-        abs_ci_width = t.ppf(1 - p_threshold / 2, self.stats["dof"]) * self.stats[f"abs_diff_std"]
-        rel_ci_width = t.ppf(1 - p_threshold / 2, self.stats["dof"]) * self.stats[f"rel_diff_std"]
+        abs_ci_width = t.ppf(1 - p_threshold / 2, self.stats["dof"]) * self.stats["abs_diff_std"]
+        rel_ci_width = t.ppf(1 - p_threshold / 2, self.stats["dof"]) * self.stats["rel_diff_std"]
 
         return significance, abs_ci_width, rel_ci_width
