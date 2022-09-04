@@ -11,7 +11,7 @@ jobs:
           python-version: '3.9'
       - name: install dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - | python3 -
+          curl -sSL https://install.python-poetry.org | python3 -
           source $HOME/.poetry/env
           poetry install --no-interaction
       - name: lint
