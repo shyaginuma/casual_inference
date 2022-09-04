@@ -11,14 +11,11 @@ jobs:
           python-version: '3.9'
       - name: install dependencies
         run: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-          source $HOME/.poetry/env
+          curl -sSL https://install.python-poetry.org | python3 -
           poetry install --no-interaction
       - name: lint
         run: |
-          source $HOME/.poetry/env
           make lint
       - name: test
         run: |
-          source $HOME/.poetry/env
           make test
