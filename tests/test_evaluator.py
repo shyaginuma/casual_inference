@@ -67,9 +67,16 @@ class TestABTestEvaluator:
         assert "ci_abs_diff" in summary.columns
         assert "ci_rel_diff" in summary.columns
         assert summary.query(f"p_value <= {p_threshold}")["significance"].isin(["up", "down"]).all()
-        assert summary.query(f"p_value <= {p_threshold}")["ci_abs_diff"].map(lambda x: True if x[1] < 0 or x[0] > 0 else False).all()
-        assert summary.query(f"p_value <= {p_threshold}")["ci_rel_diff"].map(lambda x: True if x[1] < 0 or x[0] > 0 else False).all()
-
+        assert (
+            summary.query(f"p_value <= {p_threshold}")["ci_abs_diff"]
+            .map(lambda x: True if x[1] < 0 or x[0] > 0 else False)
+            .all()
+        )
+        assert (
+            summary.query(f"p_value <= {p_threshold}")["ci_rel_diff"]
+            .map(lambda x: True if x[1] < 0 or x[0] > 0 else False)
+            .all()
+        )
 
     @pytest.mark.parametrize("diff_type", ("rel", "abs"))
     def test_summary_barplot(self, diff_type, prepare_evaluator):
