@@ -12,7 +12,6 @@ jobs:
       - name: install dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-          source $HOME/.poetry/env
           poetry install --no-interaction
       - name: lint
         run: |
