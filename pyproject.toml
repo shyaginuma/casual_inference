@@ -2,8 +2,11 @@
 name = "casual_inference"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["yaginuuun <yaginuuun@gmail.com>"]
+homepage = "https://github.com/shyaginuma"
+repository = "https://github.com/shyaginuma/casual_inference"
 license = "MIT"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
