@@ -1,1 +1,1 @@
-__all__ = ["dataset", "evaluator"]
+__all__ = ["dataset", "evaluator", "statistical_testing"]
