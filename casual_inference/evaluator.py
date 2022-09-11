@@ -7,6 +7,7 @@ from scipy.stats import t, ttest_ind_from_stats
 
 class ABTestEvaluator:
     def __init__(self) -> None:
+        self.variant_col: str = ""
         self.stats: pd.DataFrame = None
 
     def evaluate(self, data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[str]) -> None:
@@ -89,6 +90,7 @@ class ABTestEvaluator:
             axis=1,
         )
         self.stats = stats
+        self.variant_col = variant_col
 
     def summary_table(self, p_threshold: float = 0.05) -> pd.DataFrame:
         """return statistics summary.
@@ -151,10 +153,10 @@ class ABTestEvaluator:
         stats["rel_ci_width"] = rel_ci_width
 
         viz_options = {
-            "data_frame": stats,
+            "data_frame": stats.query(f"{self.variant_col} > 1"),  # not display control group
             "x": f"{diff_type}_diff_mean",
             "y": "metric",
-            "facet_col": "variant",
+            "facet_col": self.variant_col,
             "color": "significant",
             "color_discrete_map": {"up": "#54A24B", "down": "#E45756", "unclear": "silver"},
         }
@@ -162,7 +164,6 @@ class ABTestEvaluator:
             viz_options["error_x"] = f"{diff_type}_ci_width"
 
         g = px.bar(**viz_options)
-        g.show()
         return g
 
     def _eval_significance(self, p_threshold: float = 0.05) -> tuple[pd.Series, pd.Series, pd.Series]:

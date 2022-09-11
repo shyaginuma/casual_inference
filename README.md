@@ -57,7 +57,7 @@ evaluator.evaluate(
 evaluator.summary_barplot()
 ```
 
-![eval_result](https://github.com/shyaginuma/casual_inference/raw/cb80d35c021bac024b5bde9d86e9682640d099f7/examples/images/plot_abtestevaluator_result.png)
+![eval_result](https://github.com/shyaginuma/casual_inference/raw/7bf34581892a0f682a0382284131ab7527cfc95e/examples/images/plot_abtestevaluator_result.png)
 
 You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/ab_test_evaluator.ipynb) to see more detailed example.
 
