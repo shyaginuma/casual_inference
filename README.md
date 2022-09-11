@@ -21,12 +21,12 @@ The `evaluate()` method expects that the data which has a schema like as follows
 
 |unit|variant|metric_A|metric_B|...|
 |----|-------|--------|--------|---|
-|1   |1      |0       |0.01    |   |
-|2   |1      |1       |0.05    |   |
-|3   |2      |0       |0.02    |   |
-|... |...    |...     |...     |   |
+|1   |1      |0       |0.01    |...|
+|2   |1      |1       |0.05    |...|
+|3   |2      |0       |0.02    |...|
+|... |...    |...     |...     |...|
 
-The table has been already aggregated by the `unit` column. (i.e. The `unit` column will be the priary key)
+The table has been already aggregated by the `unit` column. (i.e. The `unit` column should be the primary key)
 
 ### Columns
 
