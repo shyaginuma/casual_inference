@@ -26,7 +26,7 @@ The `evaluate()` method expects that the data which has a schema like as follows
 |3   |2      |0       |0.02    |   |
 |... |...    |...     |...     |   |
 
-The table has been already aggregated by the `unit` column. (i.e. The `unit` column will be the primnary key)
+The table has been already aggregated by the `unit` column. (i.e. The `unit` column will be the priary key)
 
 ### Columns
 
