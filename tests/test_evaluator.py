@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 
 from casual_inference.dataset import sample_abtest
@@ -19,9 +18,9 @@ def prepare_abtest_evaluator() -> ABTestEvaluator:
 @pytest.fixture
 def prepare_aatest_evaluator() -> AATestEvaluator:
     sample_data = sample_abtest.create_sample_ab_result(
-        n_variant=4, sample_size=1000000, simulated_lift=[0.01, 0.05, -0.05]
+        n_variant=2, sample_size=1000000, simulated_lift=[0.0]
     )
-    evaluator = AATestEvaluator(n_simulation=10, n_variant=4)
+    evaluator = AATestEvaluator(n_simulation=100)
     evaluator.evaluate(sample_data, unit_col="rand_unit", metrics=["metric_bin", "metric_cont"])
     return evaluator
 
@@ -60,4 +59,15 @@ class TestABTestEvaluator:
 class TestAATestEvaluator:
     def test_evaluate(self, prepare_aatest_evaluator):
         evaluator: AATestEvaluator = prepare_aatest_evaluator
-        print(evaluator.stats)
+        evaluator.stats
+        pass
+
+    def test_summary_table(self, prepare_aatest_evaluator):
+        evaluator: AATestEvaluator = prepare_aatest_evaluator
+        df = evaluator.summary_table()
+        print(df)
+
+    def test_summary_hist(self, prepare_aatest_evaluator):
+        evaluator: AATestEvaluator = prepare_aatest_evaluator
+        g = evaluator.summary_hist()
+        g.show()
