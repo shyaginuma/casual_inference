@@ -18,7 +18,7 @@ def prepare_abtest_evaluator() -> ABTestEvaluator:
 @pytest.fixture
 def prepare_aatest_evaluator() -> AATestEvaluator:
     sample_data = sample_abtest.create_sample_ab_result(n_variant=2, sample_size=1000000, simulated_lift=[0.0])
-    evaluator = AATestEvaluator(n_simulation=100)
+    evaluator = AATestEvaluator(n_simulation=10)
     evaluator.evaluate(sample_data, unit_col="rand_unit", metrics=["metric_bin", "metric_cont"])
     return evaluator
 
