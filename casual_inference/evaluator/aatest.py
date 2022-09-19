@@ -28,7 +28,7 @@ class AATestEvaluator:
         self.stats: pd.DataFrame = None
 
     def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> None:
-        """split data n times, and calculate statistics n times, then store it into a table
+        """split data n times, and calculate statistics n times, then store it as an attribute.
 
         Parameters
         ----------
@@ -65,6 +65,13 @@ class AATestEvaluator:
         self.stats = result
 
     def summary_table(self) -> pd.DataFrame:
+        """Apply Kolmogorov Smirnov test to check if the p-value distribution is different from the uniform distribution.
+
+        Returns
+        -------
+        pd.DataFrame
+            stats summary
+        """
         if self.stats is None:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
 
@@ -83,6 +90,12 @@ class AATestEvaluator:
         return stats_agg
 
     def summary_plot(self) -> plotly.graph_objs.Figure:
+        """Plot histgram of p-value with coloring if the p-value distribution is different from the uniform distribution.
+
+        Returns
+        -------
+        plotly.graph_objs.Figure
+        """
         if self.stats is None:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
 

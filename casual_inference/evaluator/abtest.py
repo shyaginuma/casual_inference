@@ -33,8 +33,6 @@ class ABTestEvaluator:
     def summary_table(self, p_threshold: float = 0.05) -> pd.DataFrame:
         """return statistics summary.
 
-        In the future, styling dataframe or add another visualization can be considered.
-
         Parameters
         ----------
         p_threshold : float, optional
