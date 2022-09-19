@@ -36,7 +36,7 @@ The table has been already aggregated by the `unit` column. (i.e. The `unit` col
 
 ## Quick Start
 
-The current version of `casual_inference` only supports evaluation of A/B testing.
+The current version of `casual_inference` only supports evaluation of A/B testing and A/A testing.
 
 ### A/B test evaluation
 
@@ -57,9 +57,31 @@ evaluator.evaluate(
 evaluator.summary_barplot()
 ```
 
-![eval_result](https://github.com/shyaginuma/casual_inference/raw/7bf34581892a0f682a0382284131ab7527cfc95e/examples/images/plot_abtestevaluator_result.png)
+![eval_result](examples/images/plot_abtestevaluator_result.png)
 
 You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/ab_test_evaluator.ipynb) to see more detailed example.
+
+### A/A test evaluation
+
+```python
+from casual_inference.dataset import create_sample_ab_result
+from casual_inference.evaluator import AATestEvaluator
+
+data = create_sample_ab_result(n_variant=2, sample_size=1000000, simulated_lift=[0.0])
+
+evaluator = AATestEvaluator()
+evaluator.evaluate(
+    data=data,
+    unit_col="rand_unit",
+    metrics=["metric_bin", "metric_cont"]
+)
+
+evaluator.summary_plot()
+```
+
+![eval_result](examples/images/plot_aatestevaluator_result.png)
+
+You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/aa_test_evaluator.ipynb) to see more detailed example.
 
 ## References
 
