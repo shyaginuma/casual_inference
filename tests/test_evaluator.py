@@ -17,9 +17,7 @@ def prepare_abtest_evaluator() -> ABTestEvaluator:
 
 @pytest.fixture
 def prepare_aatest_evaluator() -> AATestEvaluator:
-    sample_data = sample_abtest.create_sample_ab_result(
-        n_variant=2, sample_size=1000000, simulated_lift=[0.0]
-    )
+    sample_data = sample_abtest.create_sample_ab_result(n_variant=2, sample_size=1000000, simulated_lift=[0.0])
     evaluator = AATestEvaluator(n_simulation=100)
     evaluator.evaluate(sample_data, unit_col="rand_unit", metrics=["metric_bin", "metric_cont"])
     return evaluator
@@ -53,21 +51,29 @@ class TestABTestEvaluator:
     @pytest.mark.parametrize("diff_type", ("rel", "abs"))
     def test_summary_barplot(self, diff_type, prepare_abtest_evaluator):
         evaluator: ABTestEvaluator = prepare_abtest_evaluator
-        evaluator.summary_barplot(diff_type=diff_type)
+        g = evaluator.summary_barplot(diff_type=diff_type)
+        g.show()
 
 
 class TestAATestEvaluator:
     def test_evaluate(self, prepare_aatest_evaluator):
         evaluator: AATestEvaluator = prepare_aatest_evaluator
-        evaluator.stats
-        pass
+        assert evaluator.stats is not None
 
     def test_summary_table(self, prepare_aatest_evaluator):
         evaluator: AATestEvaluator = prepare_aatest_evaluator
-        df = evaluator.summary_table()
-        print(df)
+        summary = evaluator.summary_table()
+        assert "metric" in summary.columns
+        assert "abs_diff_mean" in summary.columns
+        assert "rel_diff_mean" in summary.columns
+        assert "p_value" in summary.columns
+        assert "ksstat" in summary.columns
+        assert "ks_pvalue" in summary.columns
+        assert "significance" in summary.columns
+        assert (summary["ks_pvalue"] > 0).all()
+        assert (summary["ksstat"] > 0).all()
 
-    def test_summary_hist(self, prepare_aatest_evaluator):
+    def test_summary_plot(self, prepare_aatest_evaluator):
         evaluator: AATestEvaluator = prepare_aatest_evaluator
-        g = evaluator.summary_hist()
+        g = evaluator.summary_plot()
         g.show()
