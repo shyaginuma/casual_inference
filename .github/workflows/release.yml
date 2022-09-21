@@ -1,0 +1,24 @@
+name: Publish Python Package
+on:
+  release:
+    types:
+      - published
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: install dependencies
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry install --no-interaction
+      - name: set credentials
+        run: |
+          poetry config pypi-token.pipy ${{ secrets.PYPI_TOKEN }}
+      - name: publish to pypi
+        run: |
+          poetry publish --build
