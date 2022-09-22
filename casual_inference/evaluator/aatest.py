@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
-import plotly
 import plotly.express as px
+import plotly.graph_objs as go
 from scipy.stats import kstest
 
+from casual_inference.evaluator import BaseEvaluator
 from casual_inference.statistical_testing import t_test
 
 
-class AATestEvaluator:
+class AATestEvaluator(BaseEvaluator):
     def __init__(self, n_simulation: int = 1000, sample_rate: float = 1.0) -> None:
         """initialize parameters affect result of evaluation.
 
@@ -89,7 +90,7 @@ class AATestEvaluator:
         stats_agg["significance"] = stats_agg["ks_pvalue"].map(lambda x: True if x < 0.05 else False)
         return stats_agg
 
-    def summary_plot(self) -> plotly.graph_objs.Figure:
+    def summary_plot(self) -> go.Figure:
         """Plot histgram of p-value with coloring if the p-value distribution is different from the uniform distribution.
 
         Returns

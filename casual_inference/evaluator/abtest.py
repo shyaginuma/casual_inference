@@ -1,16 +1,23 @@
 import pandas as pd
-import plotly
 import plotly.express as px
+import plotly.graph_objs as go
 
+from casual_inference.evaluator import BaseEvaluator
 from casual_inference.statistical_testing import eval_ttest_significance, t_test
 
 
-class ABTestEvaluator:
+class ABTestEvaluator(BaseEvaluator):
     def __init__(self) -> None:
         self.variant_col: str = ""
         self.stats: pd.DataFrame = None
 
-    def evaluate(self, data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[str]) -> None:
+    def evaluate(
+        self,
+        data: pd.DataFrame,
+        unit_col: str,
+        metrics: list[str],
+        variant_col: str = "variant",
+    ) -> None:
         """calculate stats of A/B test and cache it into the class variable.
         At first, it only assumes metrics can handle by Welch's t-test.
 
@@ -63,9 +70,7 @@ class ABTestEvaluator:
         return_cols = [col for col in stats.columns if col[-2:] != "_c"]
         return stats.loc[:, return_cols]
 
-    def summary_barplot(
-        self, p_threshold: float = 0.05, diff_type: str = "rel", display_ci: bool = True
-    ) -> plotly.graph_objs.Figure:
+    def summary_plot(self, p_threshold: float = 0.05, diff_type: str = "rel", display_ci: bool = True) -> go.Figure:
         """plot impact and confidence interval for each metric
 
         Parameters
@@ -101,3 +106,17 @@ class ABTestEvaluator:
 
         g = px.bar(**viz_options)
         return g
+
+    def summary_barplot(self, p_threshold: float = 0.05, diff_type: str = "rel", display_ci: bool = True) -> go.Figure:
+        """plot impact and confidence interval for each metric
+
+        Parameters
+        ----------
+        p_threshold : float, optional
+            significance level, by default 0.05
+
+        Returns
+        -------
+        plotly.graph_objs.Figure
+        """
+        return self.summary_barplot(p_threshold=p_threshold, diff_type=diff_type, display_ci=display_ci)
