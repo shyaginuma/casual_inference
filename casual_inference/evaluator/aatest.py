@@ -4,8 +4,8 @@ import plotly.express as px
 import plotly.graph_objs as go
 from scipy.stats import kstest
 
-from casual_inference.evaluator.base import BaseEvaluator
-from casual_inference.statistical_testing import t_test
+from ..statistical_testing import t_test
+from .base import BaseEvaluator
 
 
 class AATestEvaluator(BaseEvaluator):
@@ -21,12 +21,12 @@ class AATestEvaluator(BaseEvaluator):
         """
         if n_simulation <= 0:
             raise ValueError("The number of simulation should be positive number.")
-        if not (sample_rate > 0.0 and sample_rate <= 1.0):
+        if not 0.0 < sample_rate <= 1.0:
             raise ValueError("The sample rate should be in (0, 1]")
 
         self.n_simulation = n_simulation
         self.sample_rate = sample_rate
-        self.stats: pd.DataFrame = None
+        self.stats: pd.DataFrame = pd.DataFrame()
 
     def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> None:
         """split data n times, and calculate statistics n times, then store it as an attribute.
@@ -73,7 +73,7 @@ class AATestEvaluator(BaseEvaluator):
         pd.DataFrame
             stats summary
         """
-        if self.stats is None:
+        if self.stats.shape[0] == 0:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
 
         stats_agg = (
@@ -95,7 +95,7 @@ class AATestEvaluator(BaseEvaluator):
 
         Returns
         -------
-        plotly.graph_objs.Figure
+        go.Figure
         """
         if self.stats is None:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")

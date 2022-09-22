@@ -2,14 +2,14 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 
-from casual_inference.evaluator.base import BaseEvaluator
-from casual_inference.statistical_testing import eval_ttest_significance, t_test
+from ..statistical_testing import eval_ttest_significance, t_test
+from .base import BaseEvaluator
 
 
 class ABTestEvaluator(BaseEvaluator):
     def __init__(self) -> None:
         self.variant_col: str = ""
-        self.stats: pd.DataFrame = None
+        self.stats: pd.DataFrame = pd.DataFrame()
 
     def evaluate(
         self,
@@ -50,7 +50,7 @@ class ABTestEvaluator(BaseEvaluator):
         pd.DataFrame
             stats summary
         """
-        if self.stats is None:
+        if self.stats.shape[0] == 0:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
 
         stats = self.stats.copy(deep=True)
@@ -77,12 +77,16 @@ class ABTestEvaluator(BaseEvaluator):
         ----------
         p_threshold : float, optional
             significance level, by default 0.05
+        diff_type : str, optional
+            The type of difference you want to plot, by default 'rel'
+        display_ci : bool, optional
+            Whether to display confidence interval, by default True
 
         Returns
         -------
-        plotly.graph_objs.Figure
+        go.Figure
         """
-        if self.stats is None:
+        if self.stats.shape[0] == 0:
             raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
         if diff_type not in ["rel", "abs"]:
             raise ValueError("Specified diff type is invalid.")
@@ -114,9 +118,13 @@ class ABTestEvaluator(BaseEvaluator):
         ----------
         p_threshold : float, optional
             significance level, by default 0.05
+        diff_type : str, optional
+            The type of difference you want to plot, by default 'rel'
+        display_ci : bool, optional
+            Whether to display confidence interval, by default True
 
         Returns
         -------
-        plotly.graph_objs.Figure
+        go.Figure
         """
         return self.summary_plot(p_threshold=p_threshold, diff_type=diff_type, display_ci=display_ci)
