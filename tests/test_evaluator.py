@@ -1,8 +1,7 @@
 import pytest
 
 from casual_inference.dataset import sample_abtest
-from casual_inference.evaluator import ABTestEvaluator
-from casual_inference.evaluator.aatest import AATestEvaluator
+from casual_inference.evaluator import AATestEvaluator, ABTestEvaluator
 
 
 @pytest.fixture

@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 from scipy.stats import kstest
 
-from casual_inference.evaluator import BaseEvaluator
+from casual_inference.evaluator.base import BaseEvaluator
 from casual_inference.statistical_testing import t_test
 
 

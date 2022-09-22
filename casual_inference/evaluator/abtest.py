@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 
-from casual_inference.evaluator import BaseEvaluator
+from casual_inference.evaluator.base import BaseEvaluator
 from casual_inference.statistical_testing import eval_ttest_significance, t_test
 
 
@@ -119,4 +119,4 @@ class ABTestEvaluator(BaseEvaluator):
         -------
         plotly.graph_objs.Figure
         """
-        return self.summary_barplot(p_threshold=p_threshold, diff_type=diff_type, display_ci=display_ci)
+        return self.summary_plot(p_threshold=p_threshold, diff_type=diff_type, display_ci=display_ci)
