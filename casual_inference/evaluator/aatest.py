@@ -24,9 +24,9 @@ class AATestEvaluator(BaseEvaluator):
         if not 0.0 < sample_rate <= 1.0:
             raise ValueError("The sample rate should be in (0, 1]")
 
+        super().__init__()
         self.n_simulation = n_simulation
         self.sample_rate = sample_rate
-        self.stats: pd.DataFrame = pd.DataFrame()
 
     def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> None:
         """split data n times, and calculate statistics n times, then store it as an attribute.
@@ -34,7 +34,7 @@ class AATestEvaluator(BaseEvaluator):
         Parameters
         ----------
         data : pd.DataFrame
-            Dataframe has randomization unit column, and metrics columns. The data should have been aggregated by the randmization unit.
+            Dataframe has randomization unit column, and metrics columns. The data should have been aggregated by the randomization unit.
         unit_col : str
             A column name stores the randomization unit. something like user_id, session_id, ...
         metrics : list[str]
@@ -73,8 +73,7 @@ class AATestEvaluator(BaseEvaluator):
         pd.DataFrame
             stats summary
         """
-        if self.stats.shape[0] == 0:
-            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+        self._validate_evaluate_executed()
 
         stats_agg = (
             self.stats.groupby("metric")[["abs_diff_mean", "rel_diff_mean", "p_value"]]
@@ -91,14 +90,13 @@ class AATestEvaluator(BaseEvaluator):
         return stats_agg
 
     def summary_plot(self) -> go.Figure:
-        """Plot histgram of p-value with coloring if the p-value distribution is different from the uniform distribution.
+        """Plot histogram of p-value with coloring if the p-value distribution is different from the uniform distribution.
 
         Returns
         -------
         go.Figure
         """
-        if self.stats is None:
-            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+        self._validate_evaluate_executed()
 
         stats = self.stats.copy(deep=True)
         stats["ks_pvalue"] = 0

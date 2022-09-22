@@ -8,8 +8,8 @@ from .base import BaseEvaluator
 
 class ABTestEvaluator(BaseEvaluator):
     def __init__(self) -> None:
+        super().__init__()
         self.variant_col: str = ""
-        self.stats: pd.DataFrame = pd.DataFrame()
 
     def evaluate(
         self,
@@ -25,7 +25,7 @@ class ABTestEvaluator(BaseEvaluator):
         ----------
         data : pd.DataFrame
             Dataframe has randomization unit column, variant assignment column, and metrics columns.
-            The data should have been aggregated by the randmization unit.
+            The data should have been aggregated by the randomization unit.
         unit_col : str
             A column name stores the randomization unit. something like user_id, session_id, ...
         variant_col : str
@@ -50,8 +50,7 @@ class ABTestEvaluator(BaseEvaluator):
         pd.DataFrame
             stats summary
         """
-        if self.stats.shape[0] == 0:
-            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+        self._validate_evaluate_executed()
 
         stats = self.stats.copy(deep=True)
         significance, abs_ci_width, rel_ci_width = eval_ttest_significance(self.stats, p_threshold)
@@ -86,8 +85,7 @@ class ABTestEvaluator(BaseEvaluator):
         -------
         go.Figure
         """
-        if self.stats.shape[0] == 0:
-            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+        self._validate_evaluate_executed()
         if diff_type not in ["rel", "abs"]:
             raise ValueError("Specified diff type is invalid.")
 
