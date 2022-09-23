@@ -48,9 +48,9 @@ class TestABTestEvaluator:
         )
 
     @pytest.mark.parametrize("diff_type", ("rel", "abs"))
-    def test_summary_barplot(self, diff_type, prepare_abtest_evaluator):
+    def test_summary_plot(self, diff_type, prepare_abtest_evaluator):
         evaluator: ABTestEvaluator = prepare_abtest_evaluator
-        g = evaluator.summary_barplot(diff_type=diff_type)
+        g = evaluator.summary_plot(diff_type=diff_type)
         g.show()
 
 

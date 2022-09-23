@@ -54,7 +54,7 @@ evaluator.evaluate(
     metrics=["metric_bin", "metric_cont"]
 )
 
-evaluator.summary_barplot()
+evaluator.summary_plot()
 ```
 
 ![eval_result](examples/images/plot_abtestevaluator_result.png)
