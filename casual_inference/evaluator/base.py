@@ -22,4 +22,4 @@ class BaseEvaluator(ABC):
 
     def _validate_evaluate_executed(self) -> None:
         if self.stats.shape[0] == 0:
-            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+            raise ValueError("Evaluated statistics haven't been calculated. Please call evaluate() in advance.")
