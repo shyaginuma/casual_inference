@@ -1,12 +1,12 @@
 import pytest
 
-from casual_inference.dataset import sample_abtest
-from casual_inference.evaluator import AATestEvaluator, ABTestEvaluator
+from casual_inference.dataset import create_sample_ab_result
+from casual_inference.evaluator import AATestEvaluator, ABTestEvaluator, SampleSizeEvaluator
 
 
 @pytest.fixture
 def prepare_abtest_evaluator() -> ABTestEvaluator:
-    sample_data = sample_abtest.create_sample_ab_result(
+    sample_data = create_sample_ab_result(
         n_variant=4, sample_size=1000000, simulated_lift=[0.01, 0.05, -0.05]
     )
     evaluator = ABTestEvaluator()
@@ -16,8 +16,15 @@ def prepare_abtest_evaluator() -> ABTestEvaluator:
 
 @pytest.fixture
 def prepare_aatest_evaluator() -> AATestEvaluator:
-    sample_data = sample_abtest.create_sample_ab_result(n_variant=2, sample_size=1000000, simulated_lift=[0.0])
+    sample_data = create_sample_ab_result(n_variant=2, sample_size=1000000, simulated_lift=[0.0])
     evaluator = AATestEvaluator(n_simulation=10)
+    evaluator.evaluate(sample_data, unit_col="rand_unit", metrics=["metric_bin", "metric_cont"])
+    return evaluator
+
+@pytest.fixture
+def prepare_samplesize_evaluator() -> SampleSizeEvaluator:
+    sample_data = create_sample_ab_result(n_variant=2, sample_size=1000000, simulated_lift=[0.0])
+    evaluator = SampleSizeEvaluator()
     evaluator.evaluate(sample_data, unit_col="rand_unit", metrics=["metric_bin", "metric_cont"])
     return evaluator
 
@@ -76,3 +83,9 @@ class TestAATestEvaluator:
         evaluator: AATestEvaluator = prepare_aatest_evaluator
         g = evaluator.summary_plot()
         g.show()
+
+
+class TestSampleSizeEvaluator:
+    def test_evaluate(self, prepare_samplesize_evaluator):
+        evaluator: SampleSizeEvaluator = prepare_samplesize_evaluator
+        assert isinstance(evaluator, SampleSizeEvaluator)
