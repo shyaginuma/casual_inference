@@ -1,4 +1,4 @@
-[![ci](https://github.com/shyaginuma/casual_inference/actions/workflows/config.yml/badge.svg)](https://github.com/shyaginuma/casual_inference/actions/workflows/config.yml)
+[![ci](https://github.com/shyaginuma/casual_inference/actions/workflows/lint_and_test.yml/badge.svg)](https://github.com/shyaginuma/casual_inference/actions/workflows/lint_and_test.yml)
 [![PyPI version](https://badge.fury.io/py/casual_inference.svg)](https://badge.fury.io/py/casual_inference)
 
 # casual_inference
