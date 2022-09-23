@@ -1,3 +1,5 @@
+import warnings
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
@@ -125,4 +127,9 @@ class ABTestEvaluator(BaseEvaluator):
         -------
         go.Figure
         """
+        warnings.warn(
+            "The summary_barplot() is deprecated and will be removed in the future release."
+            "Please use summary_plot() instead.",
+            FutureWarning,
+        )
         return self.summary_plot(p_threshold=p_threshold, diff_type=diff_type, display_ci=display_ci)
