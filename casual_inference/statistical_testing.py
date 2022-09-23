@@ -10,7 +10,7 @@ def t_test(data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[st
     ----------
     data : pd.DataFrame
         A DataFrame has randomization unit column, variant assignment column, and metrics columns.
-        The data should have been aggregated by the randmization unit.
+        The data should have been aggregated by the randomization unit.
     unit_col : str
         A column name stores the randomization unit. something like user_id, session_id, ...
     variant_col : str
@@ -96,8 +96,8 @@ def eval_ttest_significance(
         - confidence interval width of absolute difference
         - confidence interval width of relative difference
     """
-    necesary_cols = ["p_value", "t_value", "dof", "abs_diff_std", "rel_diff_std"]
-    for col in necesary_cols:
+    necessary_cols = ["p_value", "t_value", "dof", "abs_diff_std", "rel_diff_std"]
+    for col in necessary_cols:
         if col in ttest_stats.columns:
             continue
         raise ValueError(f"Necessary column does not exist: {col}")

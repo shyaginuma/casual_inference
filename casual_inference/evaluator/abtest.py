@@ -1,16 +1,23 @@
 import pandas as pd
-import plotly
 import plotly.express as px
+import plotly.graph_objs as go
 
-from casual_inference.statistical_testing import eval_ttest_significance, t_test
+from ..statistical_testing import eval_ttest_significance, t_test
+from .base import BaseEvaluator
 
 
-class ABTestEvaluator:
+class ABTestEvaluator(BaseEvaluator):
     def __init__(self) -> None:
+        super().__init__()
         self.variant_col: str = ""
-        self.stats: pd.DataFrame = None
 
-    def evaluate(self, data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[str]) -> None:
+    def evaluate(
+        self,
+        data: pd.DataFrame,
+        unit_col: str,
+        metrics: list[str],
+        variant_col: str = "variant",
+    ) -> None:
         """calculate stats of A/B test and cache it into the class variable.
         At first, it only assumes metrics can handle by Welch's t-test.
 
@@ -18,7 +25,7 @@ class ABTestEvaluator:
         ----------
         data : pd.DataFrame
             Dataframe has randomization unit column, variant assignment column, and metrics columns.
-            The data should have been aggregated by the randmization unit.
+            The data should have been aggregated by the randomization unit.
         unit_col : str
             A column name stores the randomization unit. something like user_id, session_id, ...
         variant_col : str
@@ -43,8 +50,7 @@ class ABTestEvaluator:
         pd.DataFrame
             stats summary
         """
-        if self.stats is None:
-            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+        self._validate_evaluate_executed()
 
         stats = self.stats.copy(deep=True)
         significance, abs_ci_width, rel_ci_width = eval_ttest_significance(self.stats, p_threshold)
@@ -63,22 +69,23 @@ class ABTestEvaluator:
         return_cols = [col for col in stats.columns if col[-2:] != "_c"]
         return stats.loc[:, return_cols]
 
-    def summary_barplot(
-        self, p_threshold: float = 0.05, diff_type: str = "rel", display_ci: bool = True
-    ) -> plotly.graph_objs.Figure:
+    def summary_plot(self, p_threshold: float = 0.05, diff_type: str = "rel", display_ci: bool = True) -> go.Figure:
         """plot impact and confidence interval for each metric
 
         Parameters
         ----------
         p_threshold : float, optional
             significance level, by default 0.05
+        diff_type : str, optional
+            The type of difference you want to plot, by default 'rel'
+        display_ci : bool, optional
+            Whether to display confidence interval, by default True
 
         Returns
         -------
-        plotly.graph_objs.Figure
+        go.Figure
         """
-        if self.stats is None:
-            raise ValueError("A/B test statistics haven't been calculated. Please call evaluate() in advance.")
+        self._validate_evaluate_executed()
         if diff_type not in ["rel", "abs"]:
             raise ValueError("Specified diff type is invalid.")
 
@@ -101,3 +108,21 @@ class ABTestEvaluator:
 
         g = px.bar(**viz_options)
         return g
+
+    def summary_barplot(self, p_threshold: float = 0.05, diff_type: str = "rel", display_ci: bool = True) -> go.Figure:
+        """plot impact and confidence interval for each metric
+
+        Parameters
+        ----------
+        p_threshold : float, optional
+            significance level, by default 0.05
+        diff_type : str, optional
+            The type of difference you want to plot, by default 'rel'
+        display_ci : bool, optional
+            Whether to display confidence interval, by default True
+
+        Returns
+        -------
+        go.Figure
+        """
+        return self.summary_plot(p_threshold=p_threshold, diff_type=diff_type, display_ci=display_ci)
