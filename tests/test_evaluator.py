@@ -1,14 +1,16 @@
 import pytest
 
 from casual_inference.dataset import create_sample_ab_result
-from casual_inference.evaluator import AATestEvaluator, ABTestEvaluator, SampleSizeEvaluator
+from casual_inference.evaluator import (
+    AATestEvaluator,
+    ABTestEvaluator,
+    SampleSizeEvaluator,
+)
 
 
 @pytest.fixture
 def prepare_abtest_evaluator() -> ABTestEvaluator:
-    sample_data = create_sample_ab_result(
-        n_variant=4, sample_size=1000000, simulated_lift=[0.01, 0.05, -0.05]
-    )
+    sample_data = create_sample_ab_result(n_variant=4, sample_size=1000000, simulated_lift=[0.01, 0.05, -0.05])
     evaluator = ABTestEvaluator()
     evaluator.evaluate(sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"])
     return evaluator
@@ -20,6 +22,7 @@ def prepare_aatest_evaluator() -> AATestEvaluator:
     evaluator = AATestEvaluator(n_simulation=10)
     evaluator.evaluate(sample_data, unit_col="rand_unit", metrics=["metric_bin", "metric_cont"])
     return evaluator
+
 
 @pytest.fixture
 def prepare_samplesize_evaluator() -> SampleSizeEvaluator:
@@ -88,4 +91,16 @@ class TestAATestEvaluator:
 class TestSampleSizeEvaluator:
     def test_evaluate(self, prepare_samplesize_evaluator):
         evaluator: SampleSizeEvaluator = prepare_samplesize_evaluator
-        assert isinstance(evaluator, SampleSizeEvaluator)
+        stats = evaluator.stats
+        assert (
+            stats.columns == ["threshold", "metric", "mean", "var", "count", "sample_size", "mde_abs", "mde_rel"]
+        ).all()
+        assert stats["threshold"].max() == 1.0
+        assert stats["threshold"].min() == 0.01
+        assert (stats["metric"].unique() == ["metric_bin", "metric_cont"]).all()
+        assert stats["mean"].min() > 0
+        assert stats["var"].min() > 0
+        assert stats["count"].min() > 0
+        assert stats["sample_size"].min() > 0
+        assert stats["mde_abs"].min() > 0
+        assert stats["mde_rel"].max() <= 1.0 or stats["mde_rel"].min() > 0.0
