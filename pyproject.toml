@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "casual_inference"
-version = "0.2.1"
+version = "0.3.0"
 description = ""
 authors = ["yaginuuun <yaginuuun@gmail.com>"]
 homepage = "https://github.com/shyaginuma"
