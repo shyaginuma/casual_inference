@@ -48,7 +48,7 @@ class SampleSizeEvaluator(BaseEvaluator):
         Parameters
         ----------
         target_mde : Optional[float], optional
-            The Minimum Detectable Effect you want to set in the A/B test.
+            The relative Minimum Detectable Effect you want to set in the A/B test.
 
         Returns
         -------
@@ -56,6 +56,7 @@ class SampleSizeEvaluator(BaseEvaluator):
             stats summary
         """
         self._validate_evaluate_executed()
+        _validate_target_mde(target_mde)
         stats = self.stats.copy(deep=True)
         if target_mde:
             return stats.loc[stats["mde_rel"] <= target_mde].groupby("metric").head(1)
@@ -67,15 +68,22 @@ class SampleSizeEvaluator(BaseEvaluator):
         Parameters
         ----------
         target_mde : Optional[float], optional
-            The Minimum Detectable Effect you want to set in the A/B test.
+            The relative Minimum Detectable Effect you want to set in the A/B test.
 
         Returns
         -------
         go.Figure
         """
         self._validate_evaluate_executed()
+        _validate_target_mde(target_mde)
 
         g = px.line(data_frame=self.stats, x="threshold", y="mde_rel", color="metric", markers=True)
         if target_mde:
             g.add_hline(y=target_mde, line_dash="dot", line_width=2)
         return g
+
+
+def _validate_target_mde(target_mde: Optional[float] = None) -> None:
+    if target_mde is None or (0 < target_mde < 1):
+        return
+    raise ValueError("The target MDE should be (0, 1).")

@@ -104,3 +104,15 @@ class TestSampleSizeEvaluator:
         assert stats["sample_size"].min() > 0
         assert stats["mde_abs"].min() > 0
         assert stats["mde_rel"].max() <= 1.0 or stats["mde_rel"].min() > 0.0
+
+    @pytest.mark.parametrize("target_mde", (0.03, 0.05, 0.1))
+    def test_summary_table(self, target_mde, prepare_samplesize_evaluator):
+        evaluator: SampleSizeEvaluator = prepare_samplesize_evaluator
+        summary = evaluator.summary_table(target_mde=target_mde)
+        assert summary.shape[0] == evaluator.stats["metric"].nunique()
+        assert (summary["mde_rel"] < target_mde).all()
+
+    def test_summary_plot(self, prepare_samplesize_evaluator):
+        evaluator: SampleSizeEvaluator = prepare_samplesize_evaluator
+        g = evaluator.summary_plot(target_mde=0.03)
+        g.show()
