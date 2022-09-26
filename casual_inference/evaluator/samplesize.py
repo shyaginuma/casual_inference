@@ -1,10 +1,10 @@
 from typing import Optional
-from typing_extensions import Self
 
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+from typing_extensions import Self
 
 from .base import BaseEvaluator
 
@@ -13,7 +13,8 @@ class SampleSizeEvaluator(BaseEvaluator):
     def __init__(self) -> None:
         super().__init__()
 
-    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str], n_variant: int = 2) -> Self:
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
+    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str], n_variant: int = 2) -> Self:  # type: ignore
         """Calculate statistics of metrics and mde with simulating A/B test threshold.
 
         Parameters
