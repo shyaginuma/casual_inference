@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+from typing_extensions import Self
 
 from .base import BaseEvaluator
 
@@ -12,7 +13,8 @@ class SampleSizeEvaluator(BaseEvaluator):
     def __init__(self) -> None:
         super().__init__()
 
-    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str], n_variant: int = 2) -> None:
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
+    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str], n_variant: int = 2) -> Self:  # type: ignore
         """Calculate statistics of metrics and mde with simulating A/B test threshold.
 
         Parameters
@@ -25,6 +27,11 @@ class SampleSizeEvaluator(BaseEvaluator):
             Columns stores metrics you want to evaluate.
         n_variant : int, optional
             The number of variant planned in the A/B test, by default 2
+
+        Returns
+        -------
+        self : object
+            Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
         stats = pd.DataFrame()
@@ -41,6 +48,7 @@ class SampleSizeEvaluator(BaseEvaluator):
         stats["mde_abs"] = 4 * np.sqrt(stats["var"] / stats["sample_size"])
         stats["mde_rel"] = stats["mde_abs"] / stats["mean"]
         self.stats = stats
+        return self
 
     def summary_table(self, target_mde: Optional[float] = None) -> pd.DataFrame:
         """Find threshold suffices the provided target MDE.

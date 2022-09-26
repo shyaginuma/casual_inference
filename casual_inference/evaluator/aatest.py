@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from scipy.stats import kstest
+from typing_extensions import Self
 
 from ..statistical_testing import t_test
 from .base import BaseEvaluator
@@ -28,7 +29,8 @@ class AATestEvaluator(BaseEvaluator):
         self.n_simulation = n_simulation
         self.sample_rate = sample_rate
 
-    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> None:
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
+    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> Self:  # type: ignore
         """split data n times, and calculate statistics n times, then store it as an attribute.
 
         Parameters
@@ -39,6 +41,11 @@ class AATestEvaluator(BaseEvaluator):
             A column name stores the randomization unit. something like user_id, session_id, ...
         metrics : list[str]
             Columns stores metrics you want to evaluate.
+
+        Returns
+        -------
+        self : object
+            Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
         result = pd.DataFrame()
@@ -65,6 +72,7 @@ class AATestEvaluator(BaseEvaluator):
         ]
         result = result.query("variant == 2").loc[:, return_cols].reset_index(drop=True)
         self.stats = result
+        return self
 
     def summary_table(self) -> pd.DataFrame:
         """Apply Kolmogorov Smirnov test to check if the p-value distribution is different from the uniform distribution.

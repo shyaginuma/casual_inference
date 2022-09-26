@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 import plotly.graph_objs as go
+from typing_extensions import Self
 
 
 class BaseEvaluator(ABC):
@@ -9,8 +10,9 @@ class BaseEvaluator(ABC):
         self.stats: pd.DataFrame = pd.DataFrame()
 
     @abstractmethod
-    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> None:
-        pass
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
+    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> Self:  # type: ignore
+        return self
 
     @abstractmethod
     def summary_table(self) -> pd.DataFrame:

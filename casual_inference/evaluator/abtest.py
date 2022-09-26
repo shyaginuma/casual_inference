@@ -3,6 +3,7 @@ import warnings
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+from typing_extensions import Self
 
 from ..statistical_testing import eval_ttest_significance, t_test
 from .base import BaseEvaluator
@@ -13,13 +14,14 @@ class ABTestEvaluator(BaseEvaluator):
         super().__init__()
         self.variant_col: str = ""
 
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
     def evaluate(
         self,
         data: pd.DataFrame,
         unit_col: str,
         metrics: list[str],
         variant_col: str = "variant",
-    ) -> None:
+    ) -> Self:  # type: ignore
         """calculate stats of A/B test and cache it into the class variable.
         At first, it only assumes metrics can handle by Welch's t-test.
 
@@ -35,10 +37,16 @@ class ABTestEvaluator(BaseEvaluator):
             The control variant should have value 1.
         metrics : list[str]
             Columns stores metrics you want to evaluate.
+
+        Returns
+        -------
+        self : object
+            Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
         self.stats = t_test(data, unit_col, variant_col, metrics)
         self.variant_col = variant_col
+        return self
 
     def summary_table(self, p_threshold: float = 0.05) -> pd.DataFrame:
         """return statistics summary.
