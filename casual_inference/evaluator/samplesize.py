@@ -1,5 +1,8 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objs as go
 
 from .base import BaseEvaluator
@@ -26,10 +29,17 @@ class SampleSizeEvaluator(BaseEvaluator):
         stats["mde_rel"] = stats["mde_abs"] / stats["mean"]
         self.stats = stats
 
-    def summary_table(self) -> pd.DataFrame:
+    def summary_table(self, target_mde: Optional[float] = None) -> pd.DataFrame:
         self._validate_evaluate_executed()
-        return super().summary_table()
+        stats = self.stats.copy(deep=True)
+        if target_mde:
+            return stats.loc[stats["mde_rel"] <= target_mde].groupby("metric").head(1)
+        return stats
 
-    def summary_plot(self) -> go.Figure:
+    def summary_plot(self, target_mde: Optional[float] = None) -> go.Figure:
         self._validate_evaluate_executed()
-        return super().summary_plot()
+
+        g = px.line(data_frame=self.stats, x="threshold", y="mde_rel", color="metric", markers=True)
+        if target_mde:
+            g.add_hline(y=target_mde, line_dash="dot", line_width=2)
+        return g
