@@ -83,9 +83,33 @@ evaluator.summary_plot()
 
 You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/aa_test_evaluator.ipynb) to see more detailed example.
 
+### Sample Size evaluation
+
+```python
+from casual_inference.dataset import create_sample_ab_result
+from casual_inference.evaluator import SampleSizeEvaluator
+
+data = create_sample_ab_result(n_variant=2, sample_size=1000000)
+
+evaluator = SampleSizeEvaluator()
+evaluator.evaluate(
+    data=data,
+    unit_col="rand_unit",
+    metrics=["metric_bin", "metric_cont"]
+)
+
+evaluator.summary_plot()
+```
+
+![eval_result](examples/images/plot_samplesizeevaluator_result.png)
+
+You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/sample_size_evaluator.ipynb) to see more detailed example.
+
 ## References
 
 - Kohavi, Ron, Diane Tang, and Ya Xu. 2020. ​Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing. Cambridge University Press. https://experimentguide.com/
   - A Great book covering comprehensive topics around practical A/B testing. I do recommend to read this book for all people who works on A/B testing.
 - Alex Deng, Ulf Knoblich, and Jiannan Lu. 2018. Applying the Delta Method in Metric Analytics: A Practical Guide with Novel Ideas. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD '18). Association for Computing Machinery, New York, NY, USA, 233–242. https://doi.org/10.1145/3219819.3219919
   - Describing how to approximate variance of relative difference, and when the analysis unit was more granular than the randomization unit.
+- Lucile Lu. 2016. Power, minimal detectable effect, and bucket size estimation in A/B tests. Twitter Engineering Blog. [link](https://blog.twitter.com/engineering/en_us/a/2016/power-minimal-detectable-effect-and-bucket-size-estimation-in-ab-tests)
+  - Describing Concept around Type I error and Type II error, Power Analysis. (Sample size calculation)

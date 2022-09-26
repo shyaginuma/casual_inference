@@ -40,6 +40,7 @@ class AATestEvaluator(BaseEvaluator):
         metrics : list[str]
             Columns stores metrics you want to evaluate.
         """
+        self._validate_passed_data(data, unit_col, metrics)
         result = pd.DataFrame()
         sampled_df = data.copy(deep=True)
         for i in range(self.n_simulation):

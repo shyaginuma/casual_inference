@@ -36,6 +36,7 @@ class ABTestEvaluator(BaseEvaluator):
         metrics : list[str]
             Columns stores metrics you want to evaluate.
         """
+        self._validate_passed_data(data, unit_col, metrics)
         self.stats = t_test(data, unit_col, variant_col, metrics)
         self.variant_col = variant_col
 

@@ -23,3 +23,9 @@ class BaseEvaluator(ABC):
     def _validate_evaluate_executed(self) -> None:
         if self.stats.shape[0] == 0:
             raise ValueError("Evaluated statistics haven't been calculated. Please call evaluate() in advance.")
+
+    def _validate_passed_data(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> None:
+        if data.shape[0] != data[unit_col].nunique():
+            raise ValueError("passed dataframe hasn't been aggregated by the randomization unit.")
+        if len(metrics) == 0:
+            raise ValueError("metrics hasn't been specified.")
