@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing_extensions import Self
 
 import pandas as pd
 import plotly.graph_objs as go
@@ -9,8 +10,8 @@ class BaseEvaluator(ABC):
         self.stats: pd.DataFrame = pd.DataFrame()
 
     @abstractmethod
-    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> None:
-        pass
+    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> Self:
+        return self
 
     @abstractmethod
     def summary_table(self) -> pd.DataFrame:

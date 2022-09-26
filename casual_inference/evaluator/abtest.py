@@ -1,3 +1,4 @@
+from typing_extensions import Self
 import warnings
 
 import pandas as pd
@@ -19,7 +20,7 @@ class ABTestEvaluator(BaseEvaluator):
         unit_col: str,
         metrics: list[str],
         variant_col: str = "variant",
-    ) -> None:
+    ) -> Self:
         """calculate stats of A/B test and cache it into the class variable.
         At first, it only assumes metrics can handle by Welch's t-test.
 
@@ -35,10 +36,16 @@ class ABTestEvaluator(BaseEvaluator):
             The control variant should have value 1.
         metrics : list[str]
             Columns stores metrics you want to evaluate.
+
+        Returns
+        -------
+        self : object
+            Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
         self.stats = t_test(data, unit_col, variant_col, metrics)
         self.variant_col = variant_col
+        return self
 
     def summary_table(self, p_threshold: float = 0.05) -> pd.DataFrame:
         """return statistics summary.
