@@ -1,12 +1,27 @@
 import warnings
+from dataclasses import dataclass
 
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+from scipy.stats import chisquare
 from typing_extensions import Self
 
 from ..statistical_testing import eval_ttest_significance, t_test
 from .base import BaseEvaluator
+
+
+@dataclass
+class SRMCheckResult:
+    variant: int
+    sample_size: int
+    sample_size_c: int
+    chi_square: float
+    p_value: float
+    significant: bool
+
+    def __repr__(self) -> str:
+        return f"variant: {self.variant}, control:treatment = {self.sample_size_c}:{self.sample_size}, p_value = {self.p_value}"
 
 
 class ABTestEvaluator(BaseEvaluator):
@@ -77,6 +92,12 @@ class ABTestEvaluator(BaseEvaluator):
                 axis=1,
             )
             del stats[f"{diff_type}_ci_width"]
+
+        srm_check_results = self._diagnose_srm()
+        for result in srm_check_results:
+            if result.significant:
+                print(f"[Warning] SRM was detected, pay attention to interpret the result. {result}")
+
         return_cols = [col for col in stats.columns if col[-2:] != "_c"]
         return stats.loc[:, return_cols]
 
@@ -117,6 +138,11 @@ class ABTestEvaluator(BaseEvaluator):
         if display_ci:
             viz_options["error_x"] = f"{diff_type}_ci_width"
 
+        srm_check_results = self._diagnose_srm()
+        for result in srm_check_results:
+            if result.significant:
+                print(f"[Warning] SRM was detected, pay attention to interpret the result. {result}")
+
         g = px.bar(**viz_options)
         return g
 
@@ -142,3 +168,32 @@ class ABTestEvaluator(BaseEvaluator):
             FutureWarning,
         )
         return self.summary_plot(p_threshold=p_threshold, diff_type=diff_type, display_ci=display_ci)
+
+    def _diagnose_srm(self) -> list[SRMCheckResult]:
+        """Diagnosing Sample Ratio Mismatch by applying chi-square goodness of fit test.
+        Assuming each variant has the same sample ratio.
+
+        Returns
+        -------
+        list[SRMCheckResult]
+        """
+        self._validate_evaluate_executed()
+        stats_subset = self.stats[["variant", "count", "count_c"]].drop_duplicates()
+        chi2q, p_value = chisquare(f_obs=stats_subset[["count", "count_c"]], axis=1)
+        stats_subset["chi_square"] = chi2q
+        stats_subset["p_value"] = p_value
+        stats_subset["significant"] = p_value < 0.05
+        stats_subset = stats_subset.query("variant > 1")
+
+        results = []
+        for _, row in stats_subset.iterrows():
+            result = SRMCheckResult(
+                variant=row["variant"],
+                sample_size=row["count"],
+                sample_size_c=row["count_c"],
+                chi_square=row["chi_square"],
+                p_value=row["p_value"],
+                significant=row["significant"],
+            )
+            results.append(result)
+        return results
