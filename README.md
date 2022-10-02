@@ -59,6 +59,8 @@ evaluator.summary_plot()
 
 ![eval_result](examples/images/plot_abtestevaluator_result.png)
 
+It diagnoses [Sample Ratio Mismatch](https://dl.acm.org/doi/10.1145/3292500.3330722) (SRM) automatically. When it detects the SRM, it'll display a warning on the output so that the Analyst can interpret the result carefully.
+
 You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/ab_test_evaluator.ipynb) to see more detailed example.
 
 ### A/A test evaluation
@@ -113,3 +115,5 @@ You can also see the [example notebook](https://github.com/shyaginuma/casual_inf
   - Describing how to approximate variance of relative difference, and when the analysis unit was more granular than the randomization unit.
 - Lucile Lu. 2016. Power, minimal detectable effect, and bucket size estimation in A/B tests. Twitter Engineering Blog. [link](https://blog.twitter.com/engineering/en_us/a/2016/power-minimal-detectable-effect-and-bucket-size-estimation-in-ab-tests)
   - Describing Concept around Type I error and Type II error, Power Analysis. (Sample size calculation)
+- Aleksander Fabijan, Jayant Gupchup, Somit Gupta, Jeff Omhover, Wen Qin, Lukas Vermeer, and Pavel Dmitriev. 2019. Diagnosing Sample Ratio Mismatch in Online Controlled Experiments: A Taxonomy and Rules of Thumb for Practitioners. In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD '19). Association for Computing Machinery, New York, NY, USA, 2156–2164. https://doi.org/10.1145/3292500.3330722
+  - Introduce Sample Ratio Mismatch (SRM) and describe various example of SRM happening, and provide taxonomy that help debugging when the SRM happened.
