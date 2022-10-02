@@ -172,6 +172,7 @@ class ABTestEvaluator(BaseEvaluator):
     def _diagnose_srm(self) -> list[SRMCheckResult]:
         """Diagnosing Sample Ratio Mismatch by applying chi-square goodness of fit test.
         Assuming each variant has the same sample ratio.
+        See this paper to understand what the SRM is: https://dl.acm.org/doi/10.1145/3292500.3330722
 
         Returns
         -------

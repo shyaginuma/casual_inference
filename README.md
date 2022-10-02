@@ -59,6 +59,8 @@ evaluator.summary_plot()
 
 ![eval_result](examples/images/plot_abtestevaluator_result.png)
 
+It diagnoses [Sample Ratio Mismatch](https://dl.acm.org/doi/10.1145/3292500.3330722) (SRM) automatically. When it detects the SRM, it'll display a warning on the output so that the Analyst can interpret the result carefully.
+
 You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/ab_test_evaluator.ipynb) to see more detailed example.
 
 ### A/A test evaluation
