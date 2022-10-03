@@ -1,5 +1,6 @@
 import warnings
 from dataclasses import dataclass
+from typing import Optional
 
 import pandas as pd
 import plotly.express as px
@@ -36,6 +37,7 @@ class ABTestEvaluator(BaseEvaluator):
         unit_col: str,
         metrics: list[str],
         variant_col: str = "variant",
+        segment_col: Optional[str] = None,
     ) -> Self:  # type: ignore
         """calculate stats of A/B test and cache it into the class variable.
         At first, it only assumes metrics can handle by Welch's t-test.
@@ -47,11 +49,15 @@ class ABTestEvaluator(BaseEvaluator):
             The data should have been aggregated by the randomization unit.
         unit_col : str
             A column name stores the randomization unit. something like user_id, session_id, ...
+        metrics : list[str]
+            Columns stores metrics you want to evaluate.
         variant_col : str
             A column name stores the variant assignment.
             The control variant should have value 1.
-        metrics : list[str]
-            Columns stores metrics you want to evaluate.
+        segment_col : Optional[str]
+            A column name stores 'segment' you want to break down in the analysis.
+            e.g., light users, heavy users, new registers, ...
+            When the specified column in dataframe stores numerical values, it automatically binning the values.
 
         Returns
         -------
