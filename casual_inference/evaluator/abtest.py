@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
+import pandas.api.types as pd_types
 import plotly.express as px
 import plotly.graph_objs as go
 from scipy.stats import chisquare
@@ -29,6 +30,7 @@ class ABTestEvaluator(BaseEvaluator):
     def __init__(self) -> None:
         super().__init__()
         self.variant_col: str = ""
+        self.segment_col: str = ""
 
     # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
     def evaluate(
@@ -65,7 +67,20 @@ class ABTestEvaluator(BaseEvaluator):
             Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
-        self.stats = t_test(data, unit_col, variant_col, metrics)
+        if segment_col:
+            segment = data[segment_col]
+            if pd_types.is_numeric_dtype(segment) and pd_types.is_bool_dtype(segment):
+                segment = pd.qcut(x=segment, q=5)
+
+            stats = pd.DataFrame()
+            for s in segment.unique():
+                partial_stats = t_test(data.loc[segment == s], unit_col, variant_col, metrics)
+                partial_stats[segment_col] = s
+                stats = pd.concat([stats, partial_stats])
+            self.stats = stats
+            self.segment_col = segment_col
+        else:
+            self.stats = t_test(data, unit_col, variant_col, metrics)
         self.variant_col = variant_col
         return self
 
@@ -143,6 +158,8 @@ class ABTestEvaluator(BaseEvaluator):
         }
         if display_ci:
             viz_options["error_x"] = f"{diff_type}_ci_width"
+        if len(self.segment_col) > 0:
+            viz_options["facet_row"] = self.segment_col
 
         srm_check_results = self._diagnose_srm()
         for result in srm_check_results:
