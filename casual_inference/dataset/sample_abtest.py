@@ -14,6 +14,8 @@ def create_sample_ab_result(
             - variant: which pattern the unit was assigned. assuming 1 is the control group.
             - metric_bin: a binary metric assuming the target metric of the A/B test. e.g., Click, Purchase, ...
             - metric_cont: a continuous metric assuming the target metric of the A/B test. e.g., Clicks, Purchases, ...
+            - segment_str: simulated unit group defined in advance. Used for more detailed analysis.
+            - segment_numer: simulated metrics that hasn't been divided by groups want to use more detailed analysis.
     """
     if n_variant <= 1:
         raise ValueError("n_variant should be more than or equal 2.")
@@ -23,6 +25,8 @@ def create_sample_ab_result(
     ab_result = pd.DataFrame()
     ab_result["rand_unit"] = [i for i in range(sample_size)]
     ab_result["variant"] = np.random.choice(a=[i + 1 for i in range(n_variant)], size=sample_size)
+    ab_result["segment_str"] = np.random.choice(a=[str(i + 1) for i in range(3)], p=[0.7, 0.2, 0.1], size=sample_size)
+    ab_result["segment_numer"] = np.random.poisson(lam=metric_base * 10, size=sample_size)
     ab_result["metric_bin"] = 0
     ab_result["metric_cont"] = 0
 
