@@ -16,5 +16,5 @@ def test_create_sample_ab_result():
     assert sample_data["metric_bin"].max() == 1
     assert sample_data["metric_cont"].min() == 0
     assert sample_data["metric_cont"].max() >= 1
-    assert pd_types.is_categorical_dtype(sample_data["segment_str"])
+    assert pd_types.is_string_dtype(sample_data["segment_str"])
     assert pd_types.is_numerical_dtype(sample_data["segment_numer"])
