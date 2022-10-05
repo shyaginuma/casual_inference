@@ -21,9 +21,13 @@ class SRMCheckResult:
     chi_square: float
     p_value: float
     significant: bool
+    segment: Optional[str] = None
 
     def __repr__(self) -> str:
-        return f"variant: {self.variant}, control:treatment = {self.sample_size_c}:{self.sample_size}, p_value = {self.p_value}"
+        if self.segment:
+            return f"variant: {self.variant}, segment: {self.segment} control:treatment = {self.sample_size_c}:{self.sample_size}, p_value = {self.p_value}"
+        else:
+            return f"variant: {self.variant} control:treatment = {self.sample_size_c}:{self.sample_size}, p_value = {self.p_value}"
 
 
 class ABTestEvaluator(BaseEvaluator):
@@ -160,6 +164,7 @@ class ABTestEvaluator(BaseEvaluator):
             viz_options["error_x"] = f"{diff_type}_ci_width"
         if len(self.segment_col) > 0:
             viz_options["facet_row"] = self.segment_col
+            viz_options["height"] = stats[self.segment_col].nunique() * 200
 
         srm_check_results = self._diagnose_srm()
         for result in srm_check_results:
@@ -202,7 +207,10 @@ class ABTestEvaluator(BaseEvaluator):
         list[SRMCheckResult]
         """
         self._validate_evaluate_executed()
-        stats_subset = self.stats[["variant", "count", "count_c"]].drop_duplicates()
+        if self.segment_col:
+            stats_subset = self.stats[["variant", f"{self.segment_col}", "count", "count_c"]].drop_duplicates()
+        else:
+            stats_subset = self.stats[["variant", "count", "count_c"]].drop_duplicates()
         chi2q, p_value = chisquare(f_obs=stats_subset[["count", "count_c"]], axis=1)
         stats_subset["chi_square"] = chi2q
         stats_subset["p_value"] = p_value
@@ -219,5 +227,7 @@ class ABTestEvaluator(BaseEvaluator):
                 p_value=row["p_value"],
                 significant=row["significant"],
             )
+            if self.segment_col:
+                result.segment = row[f"{self.segment_col}"]
             results.append(result)
         return results
