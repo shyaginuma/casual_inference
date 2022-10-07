@@ -26,7 +26,7 @@ def create_sample_ab_result(
     ab_result["rand_unit"] = [i for i in range(sample_size)]
     ab_result["variant"] = np.random.choice(a=[i + 1 for i in range(n_variant)], size=sample_size)
     ab_result["segment_str"] = np.random.choice(a=[str(i + 1) for i in range(3)], p=[0.7, 0.2, 0.1], size=sample_size)
-    ab_result["segment_numer"] = np.random.poisson(lam=metric_base * 10, size=sample_size)
+    ab_result["segment_numer"] = np.random.uniform(size=sample_size)
     ab_result["metric_bin"] = 0
     ab_result["metric_cont"] = 0
 
