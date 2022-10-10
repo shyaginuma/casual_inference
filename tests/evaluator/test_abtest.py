@@ -45,17 +45,18 @@ class TestABTestEvaluator:
     @pytest.mark.parametrize("segment", ("segment_str", "segment_numer"))
     def test_evaluate_segment(self, prepare_sample_data, segment):
         sample_data: pd.DataFrame = prepare_sample_data
+        metrics = ["metric_bin", "metric_cont"]
         evaluator = ABTestEvaluator().evaluate(
             sample_data,
             unit_col="rand_unit",
             variant_col="variant",
-            metrics=["metric_bin", "metric_cont"],
+            metrics=metrics,
             segment_col=segment,
         )
         stats = evaluator.stats
 
         assert segment in stats.columns
-        assert stats["count"].sum() == sample_data.shape[0]
+        assert stats["count"].sum()/len(metrics) == sample_data.shape[0]
 
         if segment == "segment_str":
             assert sample_data[segment].nunique() == stats[segment].nunique()
