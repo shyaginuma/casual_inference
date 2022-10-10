@@ -1,34 +1,7 @@
-import pandas as pd
 import pytest
 
 from casual_inference.dataset import create_sample_ab_result
-from casual_inference.evaluator import (
-    AATestEvaluator,
-    ABTestEvaluator,
-    SampleSizeEvaluator,
-)
-
-
-@pytest.fixture
-def prepare_abtest_evaluator() -> ABTestEvaluator:
-    sample_data = create_sample_ab_result(n_variant=4, sample_size=1000000, simulated_lift=[0.01, 0.05, -0.05])
-    evaluator = ABTestEvaluator()
-    evaluator.evaluate(sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"])
-    return evaluator
-
-
-@pytest.fixture
-def prepare_abtest_evaluator_with_extream_data() -> ABTestEvaluator:
-    sample_data = create_sample_ab_result(n_variant=4, sample_size=1000000)
-
-    # double sample size of control group
-    additional_data = sample_data.query("variant == 1")
-    additional_data["rand_unit"] = additional_data["rand_unit"] + 1000000
-    sample_data = pd.concat([sample_data, additional_data])
-
-    evaluator = ABTestEvaluator()
-    evaluator.evaluate(sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"])
-    return evaluator
+from casual_inference.evaluator import AATestEvaluator, SampleSizeEvaluator
 
 
 @pytest.fixture
@@ -45,45 +18,6 @@ def prepare_samplesize_evaluator() -> SampleSizeEvaluator:
     evaluator = SampleSizeEvaluator()
     evaluator.evaluate(sample_data, unit_col="rand_unit", metrics=["metric_bin", "metric_cont"])
     return evaluator
-
-
-class TestABTestEvaluator:
-    def test_evaluate(self, prepare_abtest_evaluator):
-        evaluator: ABTestEvaluator = prepare_abtest_evaluator
-        assert evaluator.stats is not None
-
-    @pytest.mark.parametrize("p_threshold", (0.01, 0.05, 0.1))
-    def test_summary_table(self, p_threshold, prepare_abtest_evaluator):
-        evaluator: ABTestEvaluator = prepare_abtest_evaluator
-        summary = evaluator.summary_table(p_threshold=p_threshold)
-
-        assert "significance" in summary.columns
-        assert "ci_abs_diff" in summary.columns
-        assert "ci_rel_diff" in summary.columns
-        assert summary.query(f"p_value <= {p_threshold}")["significance"].isin(["up", "down"]).all()
-        assert (
-            summary.query(f"p_value <= {p_threshold}")["ci_abs_diff"]
-            .map(lambda x: True if x[1] < 0 or x[0] > 0 else False)
-            .all()
-        )
-        assert (
-            summary.query(f"p_value <= {p_threshold}")["ci_rel_diff"]
-            .map(lambda x: True if x[1] < 0 or x[0] > 0 else False)
-            .all()
-        )
-
-    @pytest.mark.parametrize("diff_type", ("rel", "abs"))
-    def test_summary_plot(self, diff_type, prepare_abtest_evaluator):
-        evaluator: ABTestEvaluator = prepare_abtest_evaluator
-        g = evaluator.summary_plot(diff_type=diff_type)
-        g.show()
-
-    def test_diagnose_srm(self, prepare_abtest_evaluator_with_extream_data):
-        evaluator: ABTestEvaluator = prepare_abtest_evaluator_with_extream_data
-        results = evaluator._diagnose_srm()
-
-        assert len(results) == evaluator.stats["variant"].nunique() - 1
-        assert len([result for result in results if result.significant]) == evaluator.stats["variant"].nunique() - 1
 
 
 class TestAATestEvaluator:
