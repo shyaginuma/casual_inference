@@ -56,7 +56,7 @@ class TestABTestEvaluator:
         stats = evaluator.stats
 
         assert segment in stats.columns
-        assert stats["count"].sum()/len(metrics) == sample_data.shape[0]
+        assert stats["count"].sum() / len(metrics) == sample_data.shape[0]
 
         if segment == "segment_str":
             assert sample_data[segment].nunique() == stats[segment].nunique()
