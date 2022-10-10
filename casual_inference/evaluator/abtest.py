@@ -73,7 +73,7 @@ class ABTestEvaluator(BaseEvaluator):
         self._validate_passed_data(data, unit_col, metrics)
         if segment_col:
             segment = data[segment_col]
-            if pd_types.is_numeric_dtype(segment) and pd_types.is_bool_dtype(segment):
+            if pd_types.is_numeric_dtype(segment) and not pd_types.is_bool_dtype(segment):
                 segment = pd.qcut(x=segment, q=5)
 
             stats = pd.DataFrame()
