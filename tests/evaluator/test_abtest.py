@@ -1,9 +1,9 @@
-from multiprocessing.spawn import prepare
 import pandas as pd
 import pytest
 
 from casual_inference.dataset import create_sample_ab_result
 from casual_inference.evaluator import ABTestEvaluator
+
 
 @pytest.fixture
 def prepare_sample_data() -> pd.DataFrame:
@@ -24,13 +24,17 @@ def prepare_sample_data_extream() -> pd.DataFrame:
 @pytest.fixture
 def prepare_abtest_evaluator(prepare_sample_data) -> ABTestEvaluator:
     sample_data = prepare_sample_data
-    return ABTestEvaluator().evaluate(sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"])
+    return ABTestEvaluator().evaluate(
+        sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"]
+    )
 
 
 @pytest.fixture
 def prepare_abtest_evaluator_with_extream_data(prepare_sample_data_extream) -> ABTestEvaluator:
     sample_data = prepare_sample_data_extream
-    return ABTestEvaluator().evaluate(sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"])
+    return ABTestEvaluator().evaluate(
+        sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"]
+    )
 
 
 class TestABTestEvaluator:
@@ -41,7 +45,13 @@ class TestABTestEvaluator:
     @pytest.mark.parametrize("segment", ("segment_str", "segment_numer"))
     def test_evaluate_segment(self, prepare_sample_data, segment):
         sample_data: pd.DataFrame = prepare_sample_data
-        evaluator = ABTestEvaluator().evaluate(sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"], segment_col=segment)
+        evaluator = ABTestEvaluator().evaluate(
+            sample_data,
+            unit_col="rand_unit",
+            variant_col="variant",
+            metrics=["metric_bin", "metric_cont"],
+            segment_col=segment,
+        )
         stats = evaluator.stats
 
         assert segment in stats.columns

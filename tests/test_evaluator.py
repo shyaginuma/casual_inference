@@ -1,11 +1,7 @@
-import pandas as pd
 import pytest
 
 from casual_inference.dataset import create_sample_ab_result
-from casual_inference.evaluator import (
-    AATestEvaluator,
-    SampleSizeEvaluator,
-)
+from casual_inference.evaluator import AATestEvaluator, SampleSizeEvaluator
 
 
 @pytest.fixture
