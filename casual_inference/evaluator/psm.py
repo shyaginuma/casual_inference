@@ -1,9 +1,9 @@
 import pandas as pd
 import plotly.graph_objs as go
-from typing_extensions import Self
 from sklearn.base import BaseEstimator
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from typing_extensions import Self
 
 from .base import BaseEvaluator
 
@@ -18,6 +18,7 @@ class PSMEvaluator(BaseEvaluator):
         super().__init__()
         self.ps_model: BaseEstimator = None
 
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
     def evaluate(
         self,
         data: pd.DataFrame,
@@ -27,7 +28,7 @@ class PSMEvaluator(BaseEvaluator):
         covariates: list[str] = [],
         custom_ps_model: BaseEstimator = None,
         train_ps_model: bool = True,
-    ) -> Self:
+    ) -> Self:  # type: ignore
         """Predict propensity score and do matching, then store matched dataset into the evaluator.
         It used the Logistic Regression as the propensity score model, but you can also specify your custom model.
 
@@ -65,6 +66,7 @@ class PSMEvaluator(BaseEvaluator):
 
         # do matching
         # TODO
+        print(ps)
 
         return self
 
