@@ -1,3 +1,4 @@
+from random import random
 import pandas as pd
 import plotly.graph_objs as go
 from sklearn.base import BaseEstimator
@@ -8,8 +9,8 @@ from typing_extensions import Self
 from .base import BaseEvaluator
 
 
-class PSMEvaluator(BaseEvaluator):
-    """Evaluate treatment impact by Propensity Score Matching based on the Nearest Neighbor approach.
+class IPWEvaluator(BaseEvaluator):
+    """Evaluate treatment impact by Inversed Propensity Score
 
     Although it automatically fit the model for propensity score prediction, you also can pass your custom model. (Assuming sklearn like model)
     """
@@ -28,8 +29,9 @@ class PSMEvaluator(BaseEvaluator):
         covariates: list[str] = [],
         custom_ps_model: BaseEstimator = None,
         train_ps_model: bool = True,
+        random_state: int = 42,
     ) -> Self:  # type: ignore
-        """Predict propensity score and do matching, then store matched dataset into the evaluator.
+        """Predict propensity score and evaluate impact by IPW method.
         It used the Logistic Regression as the propensity score model, but you can also specify your custom model.
 
         Parameters
@@ -43,7 +45,8 @@ class PSMEvaluator(BaseEvaluator):
             The model should have scikit-learn like interface. (e.g., has fit(), predict_proba(), ...)
         train_ps_model : bool, optional
             Whether to do training during the call of this method. If you pass the model that have already been trained, you can set this flag False, by default True
-
+        random_state : int, optional
+            random_state to obtain the replicable result, by default specified.
         Returns
         -------
         self : object
@@ -57,16 +60,12 @@ class PSMEvaluator(BaseEvaluator):
         if custom_ps_model:
             self.ps_model = custom_ps_model
         else:
-            self.ps_model = LogisticRegression()
+            self.ps_model = LogisticRegression(random_state=random_state)
 
         if train_ps_model:
             covar_scaled = StandardScaler().fit_transform(data[covariates])
             self.ps_model.fit(covar_scaled, data[variant_col])
         ps = self.ps_model.predict_proba(covar_scaled)
-
-        # do matching
-        # TODO
-        print(ps)
 
         return self
 
@@ -77,4 +76,6 @@ class PSMEvaluator(BaseEvaluator):
         return super().summary_plot()
 
     def summary_ps_model(self):
+        # TODO: histgram of propensity scores
+        # TODO: covariate balance plot
         pass
