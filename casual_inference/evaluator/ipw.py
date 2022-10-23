@@ -1,0 +1,81 @@
+from random import random
+import pandas as pd
+import plotly.graph_objs as go
+from sklearn.base import BaseEstimator
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from typing_extensions import Self
+
+from .base import BaseEvaluator
+
+
+class IPWEvaluator(BaseEvaluator):
+    """Evaluate treatment impact by Inversed Propensity Score
+
+    Although it automatically fit the model for propensity score prediction, you also can pass your custom model. (Assuming sklearn like model)
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.ps_model: BaseEstimator = None
+
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
+    def evaluate(
+        self,
+        data: pd.DataFrame,
+        unit_col: str,
+        metrics: list[str],
+        variant_col: str = "variant",
+        covariates: list[str] = [],
+        custom_ps_model: BaseEstimator = None,
+        train_ps_model: bool = True,
+        random_state: int = 42,
+    ) -> Self:  # type: ignore
+        """Predict propensity score and evaluate impact by IPW method.
+        It used the Logistic Regression as the propensity score model, but you can also specify your custom model.
+
+        Parameters
+        ----------
+        variant_col : str, optional
+            stores binary values indicate if the sample received treatment or not, by default "variant"
+        covariates : list[str], optional
+            column names of covariate variables you want to use for the analysis, by default []
+        custom_ps_model : BaseEstimator, optional
+            If you want to use a model other than the default one for propensity score prediction, you can pass the model here.
+            The model should have scikit-learn like interface. (e.g., has fit(), predict_proba(), ...)
+        train_ps_model : bool, optional
+            Whether to do training during the call of this method. If you pass the model that have already been trained, you can set this flag False, by default True
+        random_state : int, optional
+            random_state to obtain the replicable result, by default specified.
+        Returns
+        -------
+        self : object
+            Evaluator storing statistics calculated.
+        """
+        self._validate_passed_data(data, unit_col, metrics)
+        if data[variant_col].min() != 0 or data[variant_col].max() != 1:
+            raise ValueError("value in variant_col should be binary")
+
+        # build propensity score model and make prediction
+        if custom_ps_model:
+            self.ps_model = custom_ps_model
+        else:
+            self.ps_model = LogisticRegression(random_state=random_state)
+
+        if train_ps_model:
+            covar_scaled = StandardScaler().fit_transform(data[covariates])
+            self.ps_model.fit(covar_scaled, data[variant_col])
+        ps = self.ps_model.predict_proba(covar_scaled)
+
+        return self
+
+    def summary_table(self) -> pd.DataFrame:
+        return super().summary_table()
+
+    def summary_plot(self) -> go.Figure:
+        return super().summary_plot()
+
+    def summary_ps_model(self):
+        # TODO: histgram of propensity scores
+        # TODO: covariate balance plot
+        pass
