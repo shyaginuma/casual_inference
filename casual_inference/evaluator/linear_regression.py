@@ -13,6 +13,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
         super().__init__()
         self.models: dict[str, smf.ols] = dict()
 
+    # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
     def evaluate(
         self,
         data: pd.DataFrame,
@@ -20,7 +21,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
         metrics: list[str],
         treatment_col: str = "treatment",
         covariates: list[str] = [],
-    ) -> Self:
+    ) -> Self:  # type: ignore
         """Evaluate impact by Linear Regression model
 
         Parameters
