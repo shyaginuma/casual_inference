@@ -28,10 +28,9 @@ class TestABTestEvaluator:
         assert evaluator.stats is not None
         assert len(evaluator.models) > 0
 
-    @pytest.mark.parametrize("p_threshold", (0.01, 0.05, 0.1))
-    def test_summary_table(self, p_threshold, prepare_evaluator):
+    def test_summary_table(self, prepare_evaluator):
         evaluator: LinearRegressionEvaluator = prepare_evaluator
-        summary = evaluator.summary_table(p_threshold=p_threshold)
+        summary = evaluator.summary_table()
 
         expected_columns = {
             "coef",
@@ -44,8 +43,8 @@ class TestABTestEvaluator:
         }
         assert expected_columns == set(summary.columns)
         assert set(evaluator.models.keys()) == set(summary["metric"].unique())
-        assert (summary["std err"] > 0).all()
-        assert (summary["P>|t|"] > 0).all()
+        assert (summary["std err"] >= 0.0).all()
+        assert (summary["P>|t|"] >= 0.0).all()
 
     def test_summary_plot(self, prepare_evaluator):
         evaluator: LinearRegressionEvaluator = prepare_evaluator
