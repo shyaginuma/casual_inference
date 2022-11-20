@@ -36,7 +36,7 @@ The table has been already aggregated by the `unit` column. (i.e. The `unit` col
 
 ## Quick Start
 
-The current version of `casual_inference` only supports evaluation of A/B testing and A/A testing.
+The `casual_inference` supports not only the evaluation of normal A/B testing and A/A testing, but also advanced causal inference techniques.
 
 ### A/B test evaluation
 
@@ -107,6 +107,14 @@ evaluator.summary_plot()
 
 You can also see the [example notebook](https://github.com/shyaginuma/casual_inference/blob/main/examples/sample_size_evaluator.ipynb) to see more detailed example.
 
+### Advanced causal inference techniques
+
+It also supports the advanced causal inference techniques.
+
+- Lenear Regression
+
+Another evaluation method like Propensity Score Matching is planed to implement in the future.
+
 ## References
 
 - Kohavi, Ron, Diane Tang, and Ya Xu. 2020. ​Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing. Cambridge University Press. https://experimentguide.com/
@@ -117,3 +125,5 @@ You can also see the [example notebook](https://github.com/shyaginuma/casual_inf
   - Describing Concept around Type I error and Type II error, Power Analysis. (Sample size calculation)
 - Aleksander Fabijan, Jayant Gupchup, Somit Gupta, Jeff Omhover, Wen Qin, Lukas Vermeer, and Pavel Dmitriev. 2019. Diagnosing Sample Ratio Mismatch in Online Controlled Experiments: A Taxonomy and Rules of Thumb for Practitioners. In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD '19). Association for Computing Machinery, New York, NY, USA, 2156–2164. https://doi.org/10.1145/3292500.3330722
   - Introduce Sample Ratio Mismatch (SRM) and describe various example of SRM happening, and provide taxonomy that help debugging when the SRM happened.
+- Shota Yasui. 2020. 効果検証入門. 技術評論社. https://gihyo.jp/book/2020/978-4-297-11117-5
+  - A Great introduction book about practical causal inference technique written in Japanese.
