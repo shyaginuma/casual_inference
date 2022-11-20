@@ -69,7 +69,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
             stats_partial["metric"] = metric
             self.stats = pd.concat([self.stats, stats_partial], axis=1)
 
-        self.stats = self.stats.query(f"index == '{treatment_col}'").reset_index(drop=True)
+        self.stats = self.stats.query(f"index == '{treatment_col}'").reset_index(drop=True).drop("index", axis=1)
         return self
 
     def summary_table(self) -> pd.DataFrame:
