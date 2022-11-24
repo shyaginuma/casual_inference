@@ -67,7 +67,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
             # convert statsmodels summary table to pandas dataframe
             stats_partial = pd.read_html(model.summary().tables[1].as_html(), header=0, index_col=0)[0].reset_index()
             stats_partial["metric"] = metric
-            self.stats = pd.concat([self.stats, stats_partial], axis=1)
+            self.stats = pd.concat([self.stats, stats_partial])
 
         self.stats = self.stats.query(f"index == '{treatment_col}'").reset_index(drop=True).drop("index", axis=1)
         return self
