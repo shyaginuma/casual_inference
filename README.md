@@ -109,11 +109,11 @@ You can also see the [example notebook](https://github.com/shyaginuma/casual_inf
 
 ### Advanced causal inference techniques
 
-It also supports the advanced causal inference techniques.
+It also supports advanced causal inference techniques.
 
-- Lenear Regression
+- Linear Regression
 
-Another evaluation method like Propensity Score Matching is planed to implement in the future.
+Another evaluation methods like Propensity Score Matching are planed to implement in the future.
 
 ## References
 
