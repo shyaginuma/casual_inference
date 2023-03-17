@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "casual_inference"
-version = "0.6.2"
+version = "0.6.3"
 description = "Do causal inference more casually"
 authors = ["yaginuuun <yaginuuun@gmail.com>"]
 homepage = "https://github.com/shyaginuma"
@@ -11,7 +11,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
 pandas = "^1.4.3"
-numpy = "^1.23.2"
+numpy = ">=1.18,<1.24"
 plotly = "^5.10.0"
 typing-extensions = "^4.3.0"
 scikit-learn = "^1.1.3"
