@@ -1,5 +1,6 @@
 [![ci](https://github.com/shyaginuma/casual_inference/actions/workflows/lint_and_test.yml/badge.svg)](https://github.com/shyaginuma/casual_inference/actions/workflows/lint_and_test.yml)
 [![PyPI version](https://badge.fury.io/py/casual_inference.svg)](https://badge.fury.io/py/casual_inference)
+[![Downloads](https://static.pepy.tech/badge/casual-inference/month)](https://pepy.tech/project/casual-inference)
 
 # casual_inference
 
