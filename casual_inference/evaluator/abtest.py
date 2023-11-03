@@ -208,19 +208,19 @@ class ABTestEvaluator(BaseEvaluator):
         """
         self._validate_evaluate_executed()
         if self.segment_col:
-            stats_subset = self.stats[["variant", f"{self.segment_col}", "count", "count_c"]].drop_duplicates()
+            stats_subset = self.stats[[self.variant_col, self.segment_col, "count", "count_c"]].drop_duplicates()
         else:
-            stats_subset = self.stats[["variant", "count", "count_c"]].drop_duplicates()
+            stats_subset = self.stats[[self.variant_col, "count", "count_c"]].drop_duplicates()
         chi2q, p_value = chisquare(f_obs=stats_subset[["count", "count_c"]], axis=1)
         stats_subset["chi_square"] = chi2q
         stats_subset["p_value"] = p_value
         stats_subset["significant"] = p_value < 0.05
-        stats_subset = stats_subset.query("variant > 1")
+        stats_subset = stats_subset.query(f"{self.variant_col} > 1")
 
         results = []
         for _, row in stats_subset.iterrows():
             result = SRMCheckResult(
-                variant=row["variant"],
+                variant=row[self.variant_col],
                 sample_size=row["count"],
                 sample_size_c=row["count_c"],
                 chi_square=row["chi_square"],
@@ -228,6 +228,6 @@ class ABTestEvaluator(BaseEvaluator):
                 significant=row["significant"],
             )
             if self.segment_col:
-                result.segment = row[f"{self.segment_col}"]
+                result.segment = row[self.segment_col]
             results.append(result)
         return results
