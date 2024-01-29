@@ -46,7 +46,7 @@ def t_test(data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[st
     stats = means.merge(vars, on=[variant_col, "metric"]).merge(counts, on=[variant_col, "metric"])
     stats["std"] = np.sqrt(stats["var"])
     stats["stderr"] = np.sqrt(stats["var"] / stats["count"])
-    stats = stats.merge(stats.query(f"{variant_col} == 1"), on="metric", suffixes=["", "_c"]).drop(
+    stats = stats.merge(stats.loc[stats[variant_col] == 1], on="metric", suffixes=["", "_c"]).drop(
         f"{variant_col}_c", axis=1
     )
 
@@ -113,7 +113,7 @@ def eval_ttest_significance(
         axis=1,
     )
 
-    abs_ci_width = t.ppf(1 - p_threshold / 2, ttest_stats["dof"]) * ttest_stats["abs_diff_std"]
-    rel_ci_width = t.ppf(1 - p_threshold / 2, ttest_stats["dof"]) * ttest_stats["rel_diff_std"]
+    abs_ci_width = t.ppf(1 - p_threshold / 2, ttest_stats["dof"].astype(np.float64)) * ttest_stats["abs_diff_std"]
+    rel_ci_width = t.ppf(1 - p_threshold / 2, ttest_stats["dof"].astype(np.float64)) * ttest_stats["rel_diff_std"]
 
     return significance, abs_ci_width, rel_ci_width
