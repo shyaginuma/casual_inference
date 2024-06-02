@@ -36,14 +36,16 @@ def t_test(
         raise ValueError("metrics hasn't been specified.")
     if data[variant_col].min() != 1:
         raise ValueError("the control variant seems not to exist.")
+    normal_metrics = [metric for metric in metrics if isinstance(metric, CustomMetric) == False]
+    # custom_metrics = [metric for metric in metrics if isinstance(metric, CustomMetric)]
     means = (
-        data.groupby(variant_col)[metrics].mean().stack().reset_index().rename(columns={"level_1": "metric", 0: "mean"})
+        data.groupby(variant_col)[normal_metrics].mean().stack().reset_index().rename(columns={"level_1": "metric", 0: "mean"})
     )
     vars = (
-        data.groupby(variant_col)[metrics].var().stack().reset_index().rename(columns={"level_1": "metric", 0: "var"})
+        data.groupby(variant_col)[normal_metrics].var().stack().reset_index().rename(columns={"level_1": "metric", 0: "var"})
     )
     counts = (
-        data.groupby(variant_col)[metrics]
+        data.groupby(variant_col)[normal_metrics]
         .count()
         .stack()
         .reset_index()
