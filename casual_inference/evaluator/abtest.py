@@ -1,6 +1,6 @@
 import warnings
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 import pandas as pd
 import pandas.api.types as pd_types
@@ -42,7 +42,7 @@ class ABTestEvaluator(BaseEvaluator):
         self,
         data: pd.DataFrame,
         unit_col: str,
-        metrics: list[str | CustomMetric],
+        metrics: list[Union[str, CustomMetric]],
         variant_col: str = "variant",
         segment_col: Optional[str] = None,
     ) -> Self:  # type: ignore
