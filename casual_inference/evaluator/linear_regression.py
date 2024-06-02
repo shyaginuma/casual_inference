@@ -1,9 +1,12 @@
+from typing import Union
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 import statsmodels.formula.api as smf
 from typing_extensions import Self
 
+from ..model import CustomMetric
 from .base import BaseEvaluator
 
 
@@ -25,7 +28,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
         self,
         data: pd.DataFrame,
         unit_col: str,
-        metrics: list[str],
+        metrics: list[Union[str, CustomMetric]],
         treatment_col: str = "treatment",
         covariates: list[str] = [],
     ) -> Self:  # type: ignore
@@ -61,6 +64,8 @@ class LinearRegressionEvaluator(BaseEvaluator):
             covariates_str = "+ " + "+ ".join(covariates)
 
         for metric in metrics:
+            if isinstance(metric, CustomMetric):
+                raise ValueError("CustomMetric is not supported in this evaluator.")
             model = smf.ols(formula=f"{metric} ~ {treatment_col} {covariates_str}", data=data).fit()
             self.models[metric] = model
 
