@@ -5,6 +5,7 @@ import plotly.graph_objs as go
 from scipy.stats import kstest
 from typing_extensions import Self
 
+from ..model import CustomMetric
 from ..statistical_testing import t_test
 from .base import BaseEvaluator
 
@@ -30,7 +31,7 @@ class AATestEvaluator(BaseEvaluator):
         self.sample_rate = sample_rate
 
     # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
-    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str]) -> Self:  # type: ignore
+    def evaluate(self, data: pd.DataFrame, unit_col: str, metrics: list[str | CustomMetric]) -> Self:  # type: ignore
         """split data n times, and calculate statistics n times, then store it as an attribute.
 
         Parameters
