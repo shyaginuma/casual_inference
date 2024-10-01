@@ -22,7 +22,7 @@ lxml = "^4.9.1"
 [tool.poetry.group.dev.dependencies]
 mypy = "^0.971"
 flake8 = "^5.0.4"
-black = "^22.6.0"
+black = ">=22.6,<25.0"
 isort = "^5.10.1"
 pytest = "^7.1.2"
 ipykernel = "^6.15.2"
