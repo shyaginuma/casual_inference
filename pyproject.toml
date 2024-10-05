@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "casual_inference"
-version = "0.6.7"
+version = "0.7.0"
 description = "Do causal inference more casually"
 authors = ["yaginuuun <yaginuuun@gmail.com>"]
 homepage = "https://github.com/shyaginuma"
