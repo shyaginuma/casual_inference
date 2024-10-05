@@ -40,7 +40,9 @@ def test_t_test(prepare_sample_data):
     assert (ttest_stats.columns == stats_cols).all()
     assert ttest_stats["p_value"].min() > 0.0
     assert ttest_stats["p_value"].max() <= 1.0
-    assert (ttest_stats.query("variant == 1")["mean"] == ttest_stats.query("variant == 1")["mean_c"]).all()
+    assert (
+        ttest_stats.loc[ttest_stats["variant"] == 1, "mean"] == ttest_stats.loc[ttest_stats["variant"] == 1, "mean_c"]
+    ).all()
     assert (ttest_stats["var"] >= 0).all()
     assert (ttest_stats["count"] >= 0).all()
     assert (ttest_stats["std"] >= 0).all()
@@ -64,8 +66,11 @@ def test_eval_ttest_significance(prepare_sample_data, p_threshold):
     ttest_stats["rel_ci_lower"] = ttest_stats["rel_diff_mean"] - rel_ci_width
 
     assert significance.isin(["up", "down", "unclear"]).all()
-    assert (ttest_stats.query("significance == 'up' or significance == 'down'")["p_value"] <= p_threshold).all()
-    assert (ttest_stats.query("significance == 'up'")["abs_ci_lower"] > 0).all()
-    assert (ttest_stats.query("significance == 'up'")["rel_ci_lower"] > 0).all()
-    assert (ttest_stats.query("significance == 'down'")["abs_ci_upper"] < 0).all()
-    assert (ttest_stats.query("significance == 'down'")["rel_ci_upper"] < 0).all()
+    assert (
+        ttest_stats.loc[(ttest_stats["significance"] == "up") | (ttest_stats["significance"] == "down"), "p_value"]
+        <= p_threshold
+    ).all()
+    assert (ttest_stats.loc[ttest_stats["significance"] == "up", "abs_ci_lower"] > 0).all()
+    assert (ttest_stats.loc[ttest_stats["significance"] == "up", "rel_ci_lower"] > 0).all()
+    assert (ttest_stats.loc[ttest_stats["significance"] == "down", "abs_ci_upper"] < 0).all()
+    assert (ttest_stats.loc[ttest_stats["significance"] == "down", "rel_ci_upper"] < 0).all()
