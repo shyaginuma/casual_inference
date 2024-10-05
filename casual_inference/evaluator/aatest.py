@@ -86,9 +86,7 @@ class AATestEvaluator(BaseEvaluator):
 
         stats = self.stats.copy(deep=True)
         stats_agg = (
-            stats.groupby("metric")[["abs_diff_mean", "rel_diff_mean", "p_value"]]
-            .agg(["mean", "std"])
-            .reset_index()
+            stats.groupby("metric")[["abs_diff_mean", "rel_diff_mean", "p_value"]].agg(["mean", "std"]).reset_index()
         )
         stats_agg["ksstat"] = 0
         stats_agg["ks_pvalue"] = 0
