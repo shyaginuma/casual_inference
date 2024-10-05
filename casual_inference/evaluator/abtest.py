@@ -153,7 +153,7 @@ class ABTestEvaluator(BaseEvaluator):
         stats["rel_ci_width"] = rel_ci_width
 
         viz_options = {
-            "data_frame": stats.query(f"{self.variant_col} > 1"),  # not display control group
+            "data_frame": stats.loc[stats[self.variant_col] > 1],  # not display control group
             "x": f"{diff_type}_diff_mean",
             "y": "metric",
             "facet_col": self.variant_col,
@@ -215,7 +215,7 @@ class ABTestEvaluator(BaseEvaluator):
         stats_subset["chi_square"] = chi2q
         stats_subset["p_value"] = p_value
         stats_subset["significant"] = p_value < 0.05
-        stats_subset = stats_subset.query(f"{self.variant_col} > 1")
+        stats_subset = stats_subset.loc[stats_subset[self.variant_col] > 1]
 
         results = []
         for _, row in stats_subset.iterrows():
