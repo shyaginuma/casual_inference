@@ -105,11 +105,11 @@ def eval_ttest_significance(
         raise ValueError(f"Necessary column does not exist: {col}")
 
     significance = ttest_stats.apply(
-        lambda x: "up"
-        if x["p_value"] <= p_threshold and x["t_value"] > 0
-        else "down"
-        if x["p_value"] <= p_threshold and x["t_value"] < 0
-        else "unclear",
+        lambda x: (
+            "up"
+            if x["p_value"] <= p_threshold and x["t_value"] > 0
+            else "down" if x["p_value"] <= p_threshold and x["t_value"] < 0 else "unclear"
+        ),
         axis=1,
     )
 

@@ -96,11 +96,11 @@ class LinearRegressionEvaluator(BaseEvaluator):
         self._validate_evaluate_executed()
         stats["abs_ci_width"] = stats["coef"] - stats["[0.025"]
         stats["significant"] = stats.apply(
-            lambda x: "up"
-            if x["P>|t|"] <= p_threshold and x["t"] > 0
-            else "down"
-            if x["P>|t|"] <= p_threshold and x["t"] < 0
-            else "unclear",
+            lambda x: (
+                "up"
+                if x["P>|t|"] <= p_threshold and x["t"] > 0
+                else "down" if x["P>|t|"] <= p_threshold and x["t"] < 0 else "unclear"
+            ),
             axis=1,
         )
         stats.rename(columns={"coef": "impact_abs"}, inplace=True)
