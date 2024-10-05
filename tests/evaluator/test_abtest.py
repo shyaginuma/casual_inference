@@ -15,7 +15,7 @@ def prepare_sample_data_extream() -> pd.DataFrame:
     sample_data = create_sample_ab_result(n_variant=4, sample_size=1000000)
 
     # double sample size of control group
-    additional_data = sample_data.query("variant == 1")
+    additional_data = sample_data.loc[sample_data["variant"] == 1]
     additional_data["rand_unit"] = additional_data["rand_unit"] + 1000000
     sample_data = pd.concat([sample_data, additional_data])
     return sample_data
@@ -71,14 +71,14 @@ class TestABTestEvaluator:
         assert "significance" in summary.columns
         assert "ci_abs_diff" in summary.columns
         assert "ci_rel_diff" in summary.columns
-        assert summary.query(f"p_value <= {p_threshold}")["significance"].isin(["up", "down"]).all()
+        assert summary.loc[summary["p_value"] <= p_threshold, "significance"].isin(["up", "down"]).all()
         assert (
-            summary.query(f"p_value <= {p_threshold}")["ci_abs_diff"]
+            summary.loc[summary["p_value"] <= p_threshold, "ci_abs_diff"]
             .map(lambda x: True if x[1] < 0 or x[0] > 0 else False)
             .all()
         )
         assert (
-            summary.query(f"p_value <= {p_threshold}")["ci_rel_diff"]
+            summary.loc[summary["p_value"] <= p_threshold, "ci_abs_diff"]
             .map(lambda x: True if x[1] < 0 or x[0] > 0 else False)
             .all()
         )
