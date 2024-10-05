@@ -70,7 +70,7 @@ class AATestEvaluator(BaseEvaluator):
             "rel_diff_mean",
             "p_value",
         ]
-        result = result.query("variant == 2").loc[:, return_cols].reset_index(drop=True)
+        result = result.loc[result["variant"] == 2, return_cols].reset_index(drop=True)
         self.stats = result
         return self
 
@@ -84,15 +84,16 @@ class AATestEvaluator(BaseEvaluator):
         """
         self._validate_evaluate_executed()
 
+        stats = self.stats.copy(deep=True)
         stats_agg = (
-            self.stats.groupby("metric")[["abs_diff_mean", "rel_diff_mean", "p_value"]]
+            stats.groupby("metric")[["abs_diff_mean", "rel_diff_mean", "p_value"]]
             .agg(["mean", "std"])
             .reset_index()
         )
         stats_agg["ksstat"] = 0
         stats_agg["ks_pvalue"] = 0
-        for metric in self.stats["metric"].unique():
-            result = kstest(self.stats.query(f"metric == '{metric}'")["p_value"], "uniform")
+        for metric in stats["metric"].unique():
+            result = kstest(stats.loc[stats["metric"] == metric, "p_value"], "uniform")
             stats_agg.loc[stats_agg["metric"] == metric, "ksstat"] = result.statistic
             stats_agg.loc[stats_agg["metric"] == metric, "ks_pvalue"] = result.pvalue
         stats_agg["significance"] = stats_agg["ks_pvalue"].map(lambda x: True if x < 0.05 else False)
@@ -110,7 +111,7 @@ class AATestEvaluator(BaseEvaluator):
         stats = self.stats.copy(deep=True)
         stats["ks_pvalue"] = 0
         for metric in stats["metric"].unique():
-            result = kstest(stats.query(f"metric == '{metric}'")["p_value"], "uniform")
+            result = kstest(stats.loc[stats["metric"] == metric, "p_value"], "uniform")
             stats.loc[stats["metric"] == metric, "ks_pvalue"] = result.pvalue
         stats["significance"] = stats["ks_pvalue"].map(lambda x: True if x < 0.05 else False)
 
