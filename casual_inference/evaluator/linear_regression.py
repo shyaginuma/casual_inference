@@ -60,6 +60,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
         if len(covariates) > 0:
             covariates_str = "+ " + "+ ".join(covariates)
 
+        stats = self.stats.copy(deep=True)
         for metric in metrics:
             model = smf.ols(formula=f"{metric} ~ {treatment_col} {covariates_str}", data=data).fit()
             self.models[metric] = model
@@ -67,9 +68,9 @@ class LinearRegressionEvaluator(BaseEvaluator):
             # convert statsmodels summary table to pandas dataframe
             stats_partial = pd.read_html(model.summary().tables[1].as_html(), header=0, index_col=0)[0].reset_index()
             stats_partial["metric"] = metric
-            self.stats = pd.concat([self.stats, stats_partial])
+            stats = pd.concat([stats, stats_partial])
 
-        self.stats = self.stats.query(f"index == '{treatment_col}'").reset_index(drop=True).drop("index", axis=1)
+        self.stats = stats.loc[stats["index"] == treatment_col].reset_index(drop=True).drop("index", axis=1)
         return self
 
     def summary_table(self) -> pd.DataFrame:
