@@ -2,6 +2,7 @@ import warnings
 from dataclasses import dataclass
 from typing import Optional
 
+import numpy as np
 import pandas as pd
 import pandas.api.types as pd_types
 import plotly.express as px
@@ -71,10 +72,16 @@ class ABTestEvaluator(BaseEvaluator):
             Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
+
+        # to avoid errors in later steps
+        data[variant_col] = data[variant_col].astype(int)
+        for metric_col in metrics:
+            data[metric_col] = data[metric_col].astype(np.float64)
+
         if segment_col:
             segment = data[segment_col]
             if pd_types.is_numeric_dtype(segment) and not pd_types.is_bool_dtype(segment):
-                segment = pd.qcut(x=segment, q=5)
+                segment = pd.qcut(x=segment, q=5, duplicates="drop")
 
             stats = pd.DataFrame()
             for s in segment.unique():

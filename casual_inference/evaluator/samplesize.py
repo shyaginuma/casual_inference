@@ -34,6 +34,11 @@ class SampleSizeEvaluator(BaseEvaluator):
             Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
+
+        # to avoid errors in later steps
+        for metric_col in metrics:
+            data[metric_col] = data[metric_col].astype(np.float64)
+
         stats = pd.DataFrame()
         for metric in metrics:
             stats_partial = pd.DataFrame()

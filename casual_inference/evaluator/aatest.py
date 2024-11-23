@@ -48,6 +48,11 @@ class AATestEvaluator(BaseEvaluator):
             Evaluator storing statistics calculated.
         """
         self._validate_passed_data(data, unit_col, metrics)
+
+        # to avoid errors in later steps
+        for metric_col in metrics:
+            data[metric_col] = data[metric_col].astype(np.float64)
+
         result = pd.DataFrame()
         sampled_df = data.copy(deep=True)
         for i in range(self.n_simulation):
