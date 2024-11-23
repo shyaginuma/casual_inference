@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
@@ -55,6 +56,11 @@ class LinearRegressionEvaluator(BaseEvaluator):
         self._validate_passed_data(data, unit_col, metrics)
         if set(data[treatment_col].unique()) != {0, 1}:
             raise ValueError("The treatment value should be binary.")
+
+        # to avoid errors in later steps
+        data[treatment_col] = data[treatment_col].astype(int)
+        for metric_col in metrics:
+            data[metric_col] = data[metric_col].astype(np.float64)
 
         covariates_str = ""
         if len(covariates) > 0:
