@@ -11,6 +11,7 @@ from scipy.stats import chisquare
 from typing_extensions import Self
 
 from ..statistical_testing import eval_ttest_significance, t_test
+from ..model import CustomMetric
 from .base import BaseEvaluator
 
 
@@ -42,7 +43,7 @@ class ABTestEvaluator(BaseEvaluator):
         self,
         data: pd.DataFrame,
         unit_col: str,
-        metrics: list[str],
+        metrics: list[str | CustomMetric],
         variant_col: str = "variant",
         segment_col: Optional[str] = None,
     ) -> Self:  # type: ignore

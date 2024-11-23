@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 from scipy.stats import t, ttest_ind_from_stats
 
+from .model import CustomMetric
 
-def t_test(data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[str]) -> pd.DataFrame:
+def t_test(data: pd.DataFrame, unit_col: str, variant_col: str, metrics: list[str | CustomMetric]) -> pd.DataFrame:
     """_summary_
 
     Parameters

@@ -6,6 +6,7 @@ import statsmodels.formula.api as smf
 from typing_extensions import Self
 
 from .base import BaseEvaluator
+from ..model import CustomMetric
 
 
 class LinearRegressionEvaluator(BaseEvaluator):
@@ -26,7 +27,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
         self,
         data: pd.DataFrame,
         unit_col: str,
-        metrics: list[str],
+        metrics: list[str | CustomMetric],
         treatment_col: str = "treatment",
         covariates: list[str] = [],
     ) -> Self:  # type: ignore
