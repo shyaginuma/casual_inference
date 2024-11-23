@@ -3,6 +3,7 @@ import pytest
 
 from casual_inference.dataset import create_sample_ab_result
 from casual_inference.evaluator import ABTestEvaluator
+from casual_inference.model import CustomMetric
 
 
 @pytest.fixture
@@ -25,7 +26,10 @@ def prepare_sample_data_extream() -> pd.DataFrame:
 def prepare_abtest_evaluator(prepare_sample_data) -> ABTestEvaluator:
     sample_data = prepare_sample_data
     return ABTestEvaluator().evaluate(
-        sample_data, unit_col="rand_unit", variant_col="variant", metrics=["metric_bin", "metric_cont"]
+        sample_data,
+        unit_col="rand_unit",
+        variant_col="variant",
+        metrics=["metric_bin", "metric_cont", CustomMetric("custom_metric", "metric_cont", "metric_bin")],
     )
 
 
