@@ -6,8 +6,8 @@ import plotly.express as px
 import plotly.graph_objs as go
 from typing_extensions import Self
 
-from .base import BaseEvaluator
 from ..model import CustomMetric
+from .base import BaseEvaluator
 
 
 class SampleSizeEvaluator(BaseEvaluator):

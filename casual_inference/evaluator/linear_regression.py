@@ -5,8 +5,8 @@ import plotly.graph_objs as go
 import statsmodels.formula.api as smf
 from typing_extensions import Self
 
-from .base import BaseEvaluator
 from ..model import CustomMetric
+from .base import BaseEvaluator
 
 
 class LinearRegressionEvaluator(BaseEvaluator):
@@ -20,7 +20,7 @@ class LinearRegressionEvaluator(BaseEvaluator):
 
     def __init__(self) -> None:
         super().__init__()
-        self.models: dict[str, smf.ols] = dict()
+        self.models: dict[str | CustomMetric, smf.ols] = dict()
 
     # ignore mypy error temporary, because the "Self" type support on mypy is ongoing. https://github.com/python/mypy/pull/11666
     def evaluate(

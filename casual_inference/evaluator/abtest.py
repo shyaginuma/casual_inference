@@ -10,8 +10,8 @@ import plotly.graph_objs as go
 from scipy.stats import chisquare
 from typing_extensions import Self
 
-from ..statistical_testing import eval_ttest_significance, t_test
 from ..model import CustomMetric
+from ..statistical_testing import eval_ttest_significance, t_test
 from .base import BaseEvaluator
 
 

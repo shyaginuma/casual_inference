@@ -5,8 +5,8 @@ import plotly.graph_objs as go
 from scipy.stats import kstest
 from typing_extensions import Self
 
-from ..statistical_testing import t_test
 from ..model import CustomMetric
+from ..statistical_testing import t_test
 from .base import BaseEvaluator
 
 
