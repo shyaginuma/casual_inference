@@ -74,7 +74,7 @@ class ABTestEvaluator(BaseEvaluator):
         if segment_col:
             segment = data[segment_col]
             if pd_types.is_numeric_dtype(segment) and not pd_types.is_bool_dtype(segment):
-                segment = pd.qcut(x=segment, q=5)
+                segment = pd.qcut(x=segment, q=5, duplicates="drop")
 
             stats = pd.DataFrame()
             for s in segment.unique():
